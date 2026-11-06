@@ -267,4 +267,60 @@ def test_cfo_boardpack_generation():
     assert boardpack["cfo_signoff"]["status"] == "APPROVED_FOR_BOARD_PRESENTATION"
 
 
+import json
+import pytest
+from app.mcp.server import process_jsonrpc_request
+
+
+@pytest.mark.asyncio
+async def test_mcp_server_protocol():
+    # 1. Test initialize
+    init_req = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
+    init_res = json.loads(await process_jsonrpc_request(init_req))
+    assert init_res["result"]["serverInfo"]["name"] == "sentinelpay-mcp-server"
+
+    # 2. Test tools/list
+    list_req = json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+    list_res = json.loads(await process_jsonrpc_request(list_req))
+    tools = {t["name"] for t in list_res["result"]["tools"]}
+    assert "sentinel_audit_treasury" in tools
+    assert "sentinel_guarded_purchase" in tools
+    assert "sentinel_remediate_subscription" in tools
+    assert "sentinel_auto_switch_arbitrage" in tools
+    assert "sentinel_simulate_webhook_trap" in tools
+    assert "sentinel_negotiate_b2b" in tools
+    assert "sentinel_generate_cfo_boardpack" in tools
+    assert len(tools) == 7
+
+    # 3. Test tools/call sentinel_audit_treasury
+    call_req = json.dumps({
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {
+            "name": "sentinel_audit_treasury",
+            "arguments": {"refresh_ai": False}
+        }
+    })
+    call_res = json.loads(await process_jsonrpc_request(call_req))
+    body = json.loads(call_res["result"]["content"][0]["text"])
+    assert body["subscriptions_count"] == 6
+
+    # 4. Test tools/call sentinel_generate_cfo_boardpack
+    cfo_call = json.dumps({
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "tools/call",
+        "params": {
+            "name": "sentinel_generate_cfo_boardpack",
+            "arguments": {}
+        }
+    })
+    cfo_res = json.loads(await process_jsonrpc_request(cfo_call))
+    cfo_body = json.loads(cfo_res["result"]["content"][0]["text"])
+    assert "CFO-SENTINEL-" in cfo_body["report_id"]
+    assert cfo_body["cryptographic_proof"]["chain_verified"] is True
+
+
+
 

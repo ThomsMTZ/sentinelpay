@@ -86,6 +86,26 @@ TOOLS_DEFINITIONS = [
                 }
             }
         }
+    },
+    {
+        "name": "sentinel_negotiate_b2b",
+        "description": "Executes active B2B retention negotiation with vendor using Gemini AI. Generates ultimatum letter and simulates vendor discount counter-offer.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "subscription_id": {"type": "string", "description": "Subscription ID to negotiate (e.g. SUB-DESIGNFLOW-02)"},
+                "apply_discount": {"type": "boolean", "description": "Whether to immediately apply the discount on PayPal via /revise", "default": False}
+            },
+            "required": ["subscription_id"]
+        }
+    },
+    {
+        "name": "sentinel_generate_cfo_boardpack",
+        "description": "Generates the formal corporate CFO Audit Boardpack with before/after benchmarks and SHA-256 cryptographic verification ledger.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {}
+        }
     }
 ]
 
@@ -157,6 +177,29 @@ async def handle_tool_call(name: str, arguments: dict[str, Any]) -> dict[str, An
         }
     elif name == "sentinel_simulate_webhook_trap":
         res = await sentinel_agent.simulate_incoming_paypal_webhook_trap(arguments.get("scenario", "TRIAL_CONVERSION"))
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(res, indent=2)
+                }
+            ]
+        }
+    elif name == "sentinel_negotiate_b2b":
+        res = await sentinel_agent.execute_b2b_negotiation(
+            arguments["subscription_id"],
+            apply_discount=arguments.get("apply_discount", False)
+        )
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(res, indent=2)
+                }
+            ]
+        }
+    elif name == "sentinel_generate_cfo_boardpack":
+        res = await sentinel_agent.generate_cfo_boardpack()
         return {
             "content": [
                 {
