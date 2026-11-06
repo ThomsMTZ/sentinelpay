@@ -39,8 +39,12 @@ KEYNOTE_PRESENTATION_SCRIPT = """
       z-index: 2147483647;
       transform-origin: 3px 2px;
       transform: translate3d(-100px, -100px, 0) scale(1);
-      transition: transform 0.09s cubic-bezier(0.2, 0.9, 0.3, 1);
-      will-change: transform;
+      opacity: 0;
+      transition: opacity 0.35s ease, transform 0.09s cubic-bezier(0.2, 0.9, 0.3, 1);
+      will-change: transform, opacity;
+    }
+    #apple-motion-cursor.visible {
+      opacity: 1 !important;
     }
     #apple-motion-cursor.clicking {
       transform: translate3d(var(--cursor-x), var(--cursor-y), 0) scale(0.86) !important;
@@ -223,6 +227,10 @@ KEYNOTE_PRESENTATION_SCRIPT = """
   document.body.appendChild(slideOverlay);
 
   window.showSlide = (kicker, title, subtitle, duration = 3000) => {
+    // Hide cursor during slide presentation so it never wanders in the void!
+    const c = document.getElementById('apple-motion-cursor');
+    if (c) c.classList.remove('visible');
+
     document.getElementById('slide-kicker-text').textContent = kicker;
     document.getElementById('slide-title-text').textContent = title;
     document.getElementById('slide-sub-text').textContent = subtitle;
@@ -237,6 +245,8 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     window._slideExitTimeout = setTimeout(() => {
       slideOverlay.classList.remove('active');
       slideOverlay.classList.add('exiting');
+      // Fade cursor in cleanly as live interface emerges
+      if (c) c.classList.add('visible');
     }, Math.max(duration - 550, 1000));
 
     window._slideDoneTimeout = setTimeout(() => {
@@ -343,6 +353,23 @@ def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
     page._last_mouse_pos = (x2, y2)
 
 
+def move_to_locator(page, locator, offset_x=0.5, offset_y=0.5, delay_after=1.0):
+    """
+    Moves smoothly to element real screen coordinates derived from bounding_box().
+    """
+    try:
+        box = locator.bounding_box(timeout=3500)
+        if box:
+            target_x = box["x"] + box["width"] * offset_x
+            target_y = box["y"] + box["height"] * offset_y
+            human_move(page, target_x, target_y)
+            time.sleep(delay_after)
+            return
+    except Exception as e:
+        print(f"  [warn] move_to_locator notice: {e}")
+    time.sleep(delay_after)
+
+
 def click_locator_with_ripple(page, locator, delay_after=1.2):
     """
     Moves smoothly to element bounding box, triggers press with spring ripple, then releases.
@@ -402,7 +429,7 @@ def record_session():
         # Wait until dashboard is fully hydrated and KPI banner is visible
         page.wait_for_selector("#kpi-banner", state="visible", timeout=15000)
 
-        # Inject presentation engine (Slide 1 is active immediately)
+        # Inject presentation engine (Slide 1 starts active immediately, cursor hidden)
         page.evaluate(KEYNOTE_PRESENTATION_SCRIPT)
         time.sleep(0.5)
 
@@ -414,7 +441,7 @@ def record_session():
         # -------------------------------------------------------------
         print("\n[SCENE 1] Hook & Overview (0s - 33.3s)...")
         print("  -> Displaying Slide 1: Introduction Title Slide (0.0s - 3.2s)...")
-        # Trigger slide 1 dissolve after 3.2s
+        # Trigger slide 1 dissolve after 3.2s (cursor stays hidden until slide dissolves)
         page.evaluate("""
             window.showSlide(
                 'KEYNOTE OVERVIEW • ARCHITECTURE',
@@ -425,42 +452,42 @@ def record_session():
         """)
         time.sleep(3.2)  # Wait for slide presentation and smooth dissolve
 
-        # Hover brand title & PayPal badge
-        human_move(page, 220, 32)
-        time.sleep(2.5)
-
-        # Hover connection status pill
-        human_move(page, 950, 32)
-        time.sleep(2.0)
+        # Slide dissolved -> cursor fades in cleanly onto SentinelPay brand
+        brand_logo = page.locator("span:has-text('SentinelPay')").first
+        move_to_locator(page, brand_logo, offset_x=0.5, offset_y=0.5, delay_after=2.0)
 
         # Dynamic zoom on KPI financial synthesis banner
         print("  -> Dynamic zoom onto #kpi-banner (scale: 1.15)...")
         page.evaluate("window.cameraZoomTo('#kpi-banner', 1.15, 800, false)")
         time.sleep(1.0)
 
-        # Hover potential annual savings ($2,682/yr)
-        human_move(page, 450, 185)
-        time.sleep(3.5)
+        # Hover potential annual savings heading directly via locator bounding box
+        savings_h1 = page.locator("#kpi-banner h1").first
+        move_to_locator(page, savings_h1, offset_x=0.4, offset_y=0.5, delay_after=3.0)
 
-        # Hover monthly commitments KPI
-        human_move(page, 750, 185)
-        time.sleep(3.0)
+        # Hover active monthly commitments card
+        commit_card = page.locator("#kpi-banner").get_by_text("Active Monthly Commitments").first
+        move_to_locator(page, commit_card, offset_x=0.5, offset_y=1.5, delay_after=3.0)
 
-        # Hover Health Score bar (38/100)
-        human_move(page, 1050, 185)
-        time.sleep(3.5)
+        # Hover Health Score bar
+        health_label = page.locator("#kpi-banner").get_by_text("Health Score:").first
+        move_to_locator(page, health_label, offset_x=0.5, offset_y=0.5, delay_after=3.0)
 
         # Reset camera before overview scroll
         page.evaluate("window.cameraReset(650)")
         time.sleep(0.8)
 
         # Smooth scroll down to showcase the subscriptions
-        page.mouse.wheel(0, 160)
+        page.mouse.wheel(0, 180)
         time.sleep(1.5)
-        human_move(page, 400, 380)
-        time.sleep(2.5)
-        human_move(page, 400, 480)
-        time.sleep(2.5)
+
+        # Hover first subscription row (CloudGPU)
+        sub_row1 = page.locator("span:has-text('CloudGPU Studio Pro')").first
+        move_to_locator(page, sub_row1, offset_x=0.5, offset_y=0.5, delay_after=2.5)
+
+        # Hover second subscription row (DesignFlow)
+        sub_row2 = page.locator("span:has-text('DesignFlow Enterprise')").first
+        move_to_locator(page, sub_row2, offset_x=0.5, offset_y=0.5, delay_after=2.5)
 
         # Scroll back up to top banner for scene 2
         page.mouse.wheel(0, -200)
@@ -489,31 +516,24 @@ def record_session():
         # Zoom into the Webhook Firewall section
         print("  -> Dynamic zoom onto #webhook-firewall (scale: 1.25)...")
         page.evaluate("window.cameraZoomTo('#webhook-firewall', 1.25, 750, true)")
-        time.sleep(2.5)
+        time.sleep(1.5)
 
         # Hover firewall title
-        human_move(page, 580, 220)
-        time.sleep(2.0)
+        firewall_title = page.locator("#webhook-firewall h2").first
+        move_to_locator(page, firewall_title, offset_x=0.3, offset_y=0.5, delay_after=2.0)
 
         # Click button "Simulate Trial Trap $1 -> $49" with water-ripple pulse
         trap_button = page.locator("button:has-text('Simulate Trial Trap')")
         if trap_button.count() > 0:
             print("  -> Clicking 'Simulate Trial Trap'...")
             click_locator_with_ripple(page, trap_button.first, delay_after=1.8)
-        else:
-            fallback = page.locator("button:has-text('Simuler piège fin')")
-            if fallback.count() > 0:
-                click_locator_with_ripple(page, fallback.first, delay_after=1.8)
 
         # Spotlight the instant refund receipt ($49.00 refunded)
-        time.sleep(1.5)
-        human_move(page, 660, 320)
-        time.sleep(3.0)
+        refund_badge = page.get_by_text("Instant PayPal Refund Executed").first
+        move_to_locator(page, refund_badge, offset_x=0.5, offset_y=0.5, delay_after=3.0)
 
         # Click on Developer X-Ray JSON Inspector button to reveal PayPal raw response
         inspector_btn = page.locator("button:has-text('Inspect PayPal JSON')")
-        if inspector_btn.count() == 0:
-            inspector_btn = page.locator("button:has-text('Developer X-Ray')")
         if inspector_btn.count() > 0:
             print("  -> Clicking PayPal Developer X-Ray...")
             click_locator_with_ripple(page, inspector_btn.first, delay_after=1.8)
@@ -566,7 +586,7 @@ def record_session():
             click_locator_with_ripple(page, gpu_row, delay_after=1.8)
 
         # Click 1-Click SaaS Switch Arbitrage card
-        time.sleep(1.5)
+        time.sleep(1.2)
         switch_btn = page.locator("button:has-text('Switch to RunPod')")
         if switch_btn.count() > 0:
             print("  -> Triggering 1-Click SaaS Arbitrage (Switch to RunPod)...")
@@ -591,12 +611,12 @@ def record_session():
             time.sleep(2.5)
 
             # Hover formal notice letter
-            human_move(page, 960, 420)
-            time.sleep(2.5)
+            letter_box = page.locator("#b2b-modal pre").first
+            move_to_locator(page, letter_box, offset_x=0.5, offset_y=0.4, delay_after=2.5)
 
             # Hover 40% discount savings
-            human_move(page, 960, 520)
-            time.sleep(2.0)
+            counter_box = page.locator("#b2b-modal").get_by_text("Retention Counter-Offer Accepted").first
+            move_to_locator(page, counter_box, offset_x=0.5, offset_y=0.5, delay_after=2.0)
 
             # Click "Apply 40% Discount on PayPal via /revise"
             apply_btn = page.locator("button:has-text('Apply 40% Discount')").or_(
@@ -604,17 +624,34 @@ def record_session():
             )
             if apply_btn.count() > 0:
                 print("  -> Applying 40% discount on PayPal via /revise...")
-                click_locator_with_ripple(page, apply_btn.first, delay_after=2.2)
+                click_locator_with_ripple(page, apply_btn.first, delay_after=2.5)
 
-            # Close negotiation modal
-            close_modal = page.locator("#b2b-modal button:has-text('Close')")
-            if close_modal.count() > 0:
-                print("  -> Closing B2B negotiation modal...")
-                click_locator_with_ripple(page, close_modal.first, delay_after=1.2)
+            # RESET CAMERA FIRST so modal coordinates and buttons are 100% natural and unscaled!
+            print("  -> Resetting camera and closing B2B modal...")
+            page.evaluate("window.cameraReset(400)")
+            time.sleep(0.6)
+
+            # Click close button with locator
+            close_btn = page.locator("#b2b-close-btn")
+            if close_btn.count() > 0 and close_btn.first.is_visible():
+                click_locator_with_ripple(page, close_btn.first, delay_after=0.8)
+
+            # Triple-check: if modal is still open, close it via state / backdrop click!
+            page.evaluate("""
+                (() => {
+                    const btn = document.getElementById('b2b-close-btn') || document.getElementById('b2b-close-x-btn');
+                    if (btn) btn.click();
+                    else {
+                        const modal = document.getElementById('b2b-modal');
+                        if (modal) modal.click();
+                    }
+                })()
+            """)
+            time.sleep(0.8)
 
         # Reset camera
         page.evaluate("window.cameraReset(600)")
-        time.sleep(1.0)
+        time.sleep(0.8)
 
         # Scroll up to trigger batch sweep button
         page.mouse.wheel(0, -220)
@@ -627,9 +664,8 @@ def record_session():
             click_locator_with_ripple(page, sweep_btn.first, delay_after=2.5)
 
         # Hover over transformed Health Score (98/100 A+)
-        time.sleep(1.5)
-        human_move(page, 1050, 185)
-        time.sleep(3.0)
+        health_final = page.locator("#kpi-banner").get_by_text("Health Score:").first
+        move_to_locator(page, health_final, offset_x=0.5, offset_y=0.5, delay_after=3.0)
 
         # Synchronize with Scene 3 audio boundary (124.6s)
         elapsed = time.time() - start_time
@@ -702,27 +738,41 @@ def record_session():
 
             # Dynamic camera zoom on the CFO Boardpack modal
             page.evaluate("window.cameraZoomTo('#cfo-modal', 1.15, 600, false)")
-            time.sleep(3.0)
+            time.sleep(2.5)
 
             # Hover KPI benchmark grid inside CFO Boardpack
-            human_move(page, 700, 320)
-            time.sleep(3.5)
+            bench_grid = page.locator("#cfo-modal").get_by_text("Baseline Spend").first
+            move_to_locator(page, bench_grid, offset_x=0.5, offset_y=1.5, delay_after=3.0)
 
             # Hover cryptographic SHA-256 chain verification badge
-            human_move(page, 500, 520)
-            time.sleep(3.0)
+            sha_badge = page.locator("#cfo-modal").get_by_text("Cryptographic SHA-256 Chain Verified").first
+            move_to_locator(page, sha_badge, offset_x=0.5, offset_y=0.5, delay_after=3.0)
+
+            # Reset camera before closing modal
+            page.evaluate("window.cameraReset(500)")
+            time.sleep(0.6)
 
             # Close CFO Modal
-            cfo_close = page.locator("button:has-text('Print')").locator("xpath=..").locator("button").last
+            cfo_close = page.locator("#cfo-modal button:has-text('Print')").locator("xpath=..").locator("button").last
             if cfo_close.count() > 0:
-                click_locator_with_ripple(page, cfo_close, delay_after=1.2)
+                click_locator_with_ripple(page, cfo_close, delay_after=1.0)
+            
+            # Double check CFO modal is closed
+            page.evaluate("""
+                (() => {
+                    const modal = document.getElementById('cfo-modal');
+                    if (modal) modal.click();
+                })()
+            """)
+            time.sleep(0.5)
 
         # Reset camera
         page.evaluate("window.cameraReset(600)")
         time.sleep(1.0)
 
         # Final showcase hover on top brand bar
-        human_move(page, 960, 400)
+        brand_final = page.locator("span:has-text('SentinelPay')").first
+        move_to_locator(page, brand_final, offset_x=0.5, offset_y=0.5, delay_after=2.0)
 
         # Synchronize with master audio duration (~173.0s)
         elapsed = time.time() - start_time

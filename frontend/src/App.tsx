@@ -1787,8 +1787,8 @@ export default function App() {
 
       {/* Credentials Configuration Modal Sheet */}
       {showCredentialsModal && (
-        <div className="fixed inset-0 z-50 bg-[#0C121D]/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl spring-settle">
+        <div onClick={() => setShowCredentialsModal(false)} className="fixed inset-0 z-50 bg-[#0C121D]/40 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer">
+          <div onClick={(e) => e.stopPropagation()} className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl spring-settle cursor-default">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-semibold text-[#0C121D]">
                 PayPal Sandbox & Google Gemini Credentials
@@ -1883,8 +1883,8 @@ export default function App() {
 
       {/* Corporate CFO Audit Boardpack Modal */}
       {showCFOModal && cfoBoardpack && (
-        <div id="cfo-modal" className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl my-8 spring-settle">
+        <div id="cfo-modal" onClick={() => setShowCFOModal(false)} className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto cursor-pointer">
+          <div onClick={(e) => e.stopPropagation()} className="bg-white border border-[#E2E8F0] rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl my-8 spring-settle cursor-default">
             <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -2065,8 +2065,8 @@ export default function App() {
 
       {/* B2B Retention Negotiation Modal */}
       {negotiatingSub && (
-        <div id="b2b-modal" className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 spring-settle">
+        <div id="b2b-modal" onClick={() => setNegotiatingSub(null)} className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto cursor-pointer">
+          <div onClick={(e) => e.stopPropagation()} className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 spring-settle cursor-default">
             <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -2081,6 +2081,7 @@ export default function App() {
               </div>
               <button
                 type="button"
+                id="b2b-close-x-btn"
                 onClick={() => setNegotiatingSub(null)}
                 className="p-1.5 rounded-lg text-[#718096] hover:bg-[#F1F5F9] hover:text-[#0C121D]"
               >
@@ -2116,7 +2117,7 @@ export default function App() {
                       Retention Counter-Offer Accepted (40% Discount Authorized)
                     </span>
                     <span className="text-xs font-bold text-[#0E7C47] tabular-figure">
-                      +{formatUSD(negotiationResult.counter_offer.annual_savings_usd)}/an annual savings
+                      +{formatUSD(negotiationResult.counter_offer.annual_savings_usd)}/yr annual savings
                     </span>
                   </div>
                   <p className="text-xs text-[#2D3748] leading-relaxed italic">
@@ -2126,13 +2127,13 @@ export default function App() {
                     <div>
                       <span className="text-[#718096]">Previous price: </span>
                       <span className="font-semibold text-[#A0AEC0] line-through tabular-figure">
-                        {formatUSD(negotiatingSub.monthly_cost)}/mois
+                        {formatUSD(negotiatingSub.monthly_cost)}/mo
                       </span>
                     </div>
                     <div>
                       <span className="text-[#718096]">Negotiated new price: </span>
                       <span className="font-bold text-[#003087] tabular-figure">
-                        {formatUSD(negotiationResult.counter_offer.proposed_monthly_cost)}/mois
+                        {formatUSD(negotiationResult.counter_offer.proposed_monthly_cost)}/mo
                       </span>
                     </div>
                   </div>
@@ -2142,7 +2143,7 @@ export default function App() {
                 <div className="pt-2 flex items-center justify-end gap-3">
                   <button
                     type="button"
-                    onClick={() => setNegotiatingSub(null)}
+                    id="b2b-close-btn" onClick={() => setNegotiatingSub(null)}
                     className="pressable px-4 py-2.5 rounded-xl border border-[#CBD5E1] text-xs font-medium text-[#4A5568]"
                   >
                     Close
