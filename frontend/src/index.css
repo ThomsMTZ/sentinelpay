@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-optical-sizing: auto;
+    color: #0C121D;
+    background-color: #F5F7FA;
+  }
+
+  body {
+    margin: 0;
+    line-height: 1.5;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Apple-style optical typography & tabular financial figures */
+.tabular-figure {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+.heading-tight {
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+/* Apple WWDC 2018: Instant pointer-down feedback (kill latency) */
+.pressable {
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 150ms ease,
+              border-color 150ms ease,
+              box-shadow 150ms ease;
+  will-change: transform;
+  user-select: none;
+}
+
+.pressable:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 80ms ease-out;
+}
+
+/* Translucent floating chrome (Apple Materials & Depth) */
+.surface-translucent {
+  background-color: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Critically damped spring-like enter transition */
+.spring-settle {
+  transition: all 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Accessibility: Reduced motion & Reduced transparency */
+@media (prefers-reduced-motion: reduce) {
+  .pressable,
+  .spring-settle {
+    transition: opacity 150ms ease !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .surface-translucent {
+    background-color: #FFFFFF !important;
+    backdrop-filter: none !important;
+  }
+}
