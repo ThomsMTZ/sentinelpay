@@ -223,10 +223,11 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     <h1 class="slide-title" id="slide-title-text">Autonomous PayPal Treasury & Agentic Commerce</h1>
     <div class="slide-divider"></div>
     <p class="slide-subtitle" id="slide-sub-text">Eliminating zombie SaaS waste & policy-guarding autonomous AI spending with PayPal Sandbox APIs</p>
+    <div id="slide-conclusion-extra" style="display: none;"></div>
   `;
   document.body.appendChild(slideOverlay);
 
-  window.showSlide = (kicker, title, subtitle, duration = 3000) => {
+  window.showSlide = (kicker, title, subtitle, duration = 3000, isFinal = false) => {
     // Hide cursor during slide presentation so it never wanders in the void!
     const c = document.getElementById('apple-motion-cursor');
     if (c) c.classList.remove('visible');
@@ -235,11 +236,49 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     document.getElementById('slide-title-text').textContent = title;
     document.getElementById('slide-sub-text').textContent = subtitle;
 
+    const extra = document.getElementById('slide-conclusion-extra');
+    if (isFinal) {
+      extra.style.display = 'flex';
+      extra.innerHTML = `
+        <div style="margin-top: 36px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+            <span style="padding: 7px 18px; border-radius: 9999px; background: #F8FAFC; border: 1px solid #CBD5E1; font-size: 14px; font-weight: 600; color: #1E293B; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="color: #003087;">●</span> PayPal Sandbox REST APIs
+            </span>
+            <span style="padding: 7px 18px; border-radius: 9999px; background: #F8FAFC; border: 1px solid #CBD5E1; font-size: 14px; font-weight: 600; color: #1E293B; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="color: #0070BA;">●</span> Google Gemini 2.5 Flash
+            </span>
+            <span style="padding: 7px 18px; border-radius: 9999px; background: #F8FAFC; border: 1px solid #CBD5E1; font-size: 14px; font-weight: 600; color: #1E293B; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="color: #0E7C47;">●</span> Deterministic Policy Guardrails
+            </span>
+            <span style="padding: 7px 18px; border-radius: 9999px; background: #F8FAFC; border: 1px solid #CBD5E1; font-size: 14px; font-weight: 600; color: #1E293B; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="color: #D97706;">●</span> Cryptographic SHA-256 Ledger
+            </span>
+          </div>
+          <div style="display: inline-flex; align-items: center; gap: 10px; padding: 12px 28px; border-radius: 14px; background: #003087; color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 4px 16px rgba(0, 48, 135, 0.28); margin-top: 6px;">
+            <span>GitHub Repository:</span>
+            <span style="color: #93C5FD; text-decoration: underline;">github.com/ThomsMTZ/sentinelpay</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px;">
+            PayPal AI Hackathon 2026 Submission • Autonomous Treasury & Agentic Commerce Copilot
+          </div>
+        </div>
+      `;
+    } else {
+      extra.style.display = 'none';
+      extra.innerHTML = '';
+    }
+
     slideOverlay.classList.remove('exiting');
     slideOverlay.classList.add('active');
 
     if (window._slideExitTimeout) clearTimeout(window._slideExitTimeout);
     if (window._slideDoneTimeout) clearTimeout(window._slideDoneTimeout);
+
+    if (isFinal) {
+      // Keep final thank-you slide active until the end
+      return;
+    }
 
     // Begin smooth dissolve into live video
     window._slideExitTimeout = setTimeout(() => {
@@ -298,8 +337,11 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     stage.style.transform = `translate3d(${translateX.toFixed(2)}px, ${translateY.toFixed(2)}px, 0) scale(${scale})`;
 
     if (spotlight) {
-      scrim.style.background = 'radial-gradient(circle at 50% 50%, rgba(12, 18, 29, 0.12) 40%, rgba(12, 18, 29, 0.65) 90%)';
+      // Radiant spotlight halo: center is brilliant white luminescence (not dark!), outer edges soft cinematic vignette
+      scrim.style.background = 'radial-gradient(circle 560px at 50% 50%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0) 55%, rgba(12, 18, 29, 0.22) 78%, rgba(12, 18, 29, 0.48) 100%)';
       scrim.style.opacity = '1';
+    } else {
+      scrim.style.opacity = '0';
     }
   };
 
@@ -307,6 +349,9 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     stage.style.transition = `transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1)`;
     stage.style.transform = 'translate3d(0, 0, 0) scale(1)';
     scrim.style.opacity = '0';
+    setTimeout(() => {
+      stage.style.transform = 'none';
+    }, duration + 50);
   };
 })();
 """
@@ -592,71 +637,81 @@ def record_session():
             print("  -> Triggering 1-Click SaaS Arbitrage (Switch to RunPod)...")
             click_locator_with_ripple(page, switch_btn.first, delay_after=2.0)
 
-        # Robust expansion of DesignFlow Enterprise row
+        # Scroll and expand DesignFlow Enterprise row
         print("  -> Ensuring DesignFlow Enterprise row is expanded...")
-        neg_btn = page.locator("button:has-text('Negotiate B2B Discount')")
-        if neg_btn.count() == 0 or not neg_btn.first.is_visible():
-            design_row = page.locator("span:has-text('DesignFlow Enterprise')").first
-            if design_row.count() > 0:
-                click_locator_with_ripple(page, design_row, delay_after=1.8)
+        page.evaluate("window.cameraReset(400)")
+        time.sleep(0.5)
 
-        # Click "Negotiate B2B Discount (-40%)"
-        neg_btn = page.locator("button:has-text('Negotiate B2B Discount')")
-        if neg_btn.count() > 0 and neg_btn.first.is_visible():
-            print("  -> Launching Gemini Autonomous Retention Negotiator...")
-            click_locator_with_ripple(page, neg_btn.first, delay_after=2.5)
+        # Scroll down so DesignFlow Enterprise is comfortably in view
+        page.mouse.wheel(0, 260)
+        time.sleep(0.8)
 
-            # Camera zoom on the B2B modal
-            page.evaluate("window.cameraZoomTo('#b2b-modal', 1.15, 600, true)")
-            time.sleep(2.5)
+        design_row = page.locator("span:has-text('DesignFlow Enterprise')").first
+        design_row.scroll_into_view_if_needed()
+        time.sleep(0.4)
+        click_locator_with_ripple(page, design_row, delay_after=1.5)
 
-            # Hover formal notice letter
-            letter_box = page.locator("#b2b-modal pre").first
-            move_to_locator(page, letter_box, offset_x=0.5, offset_y=0.4, delay_after=2.5)
+        # Locate and click Negotiate B2B Discount button
+        neg_btn = page.locator("button:has-text('Negotiate B2B Discount')").first
+        neg_btn.scroll_into_view_if_needed()
+        time.sleep(0.4)
+        print("  -> Launching Gemini Autonomous Retention Negotiator...")
+        click_locator_with_ripple(page, neg_btn, delay_after=1.5)
 
-            # Hover 40% discount savings
-            counter_box = page.locator("#b2b-modal").get_by_text("Retention Counter-Offer Accepted").first
-            move_to_locator(page, counter_box, offset_x=0.5, offset_y=0.5, delay_after=2.0)
+        # Clear stage transform to 'none' so modal is 100% dead center in the viewport!
+        page.evaluate("""
+            (() => {
+                const stage = document.getElementById('root') || document.body;
+                stage.style.transform = 'none';
+            })()
+        """)
 
-            # Click "Apply 40% Discount on PayPal via /revise"
-            apply_btn = page.locator("button:has-text('Apply 40% Discount')").or_(
-                page.locator("button:has-text('Appliquer -40%')")
-            )
-            if apply_btn.count() > 0:
-                print("  -> Applying 40% discount on PayPal via /revise...")
-                click_locator_with_ripple(page, apply_btn.first, delay_after=2.5)
+        # Wait for modal to render completely centered at 100% scale
+        page.wait_for_selector("#b2b-modal pre", state="visible", timeout=12000)
+        time.sleep(1.0)
 
-            # RESET CAMERA FIRST so modal coordinates and buttons are 100% natural and unscaled!
-            print("  -> Resetting camera and closing B2B modal...")
-            page.evaluate("window.cameraReset(400)")
-            time.sleep(0.6)
+        # Hover formal notice letter
+        letter_box = page.locator("#b2b-modal pre").first
+        move_to_locator(page, letter_box, offset_x=0.5, offset_y=0.4, delay_after=2.5)
 
-            # Click close button with locator
-            close_btn = page.locator("#b2b-close-btn")
-            if close_btn.count() > 0 and close_btn.first.is_visible():
-                click_locator_with_ripple(page, close_btn.first, delay_after=0.8)
+        # Hover 40% discount savings
+        counter_box = page.locator("#b2b-modal").get_by_text("Retention Counter-Offer Accepted").first
+        move_to_locator(page, counter_box, offset_x=0.5, offset_y=0.5, delay_after=2.0)
 
-            # Triple-check: if modal is still open, close it via state / backdrop click!
-            page.evaluate("""
-                (() => {
-                    const btn = document.getElementById('b2b-close-btn') || document.getElementById('b2b-close-x-btn');
-                    if (btn) btn.click();
-                    else {
-                        const modal = document.getElementById('b2b-modal');
-                        if (modal) modal.click();
-                    }
-                })()
-            """)
-            time.sleep(0.8)
+        # Click 'Apply 40% Discount on PayPal via /revise'
+        apply_btn = page.locator("button:has-text('Apply 40% Discount')").or_(
+            page.locator("button:has-text('Appliquer -40%')")
+        )
+        if apply_btn.count() > 0:
+            print("  -> Applying 40% discount on PayPal via /revise...")
+            click_locator_with_ripple(page, apply_btn.first, delay_after=2.5)
+
+        # Close B2B modal cleanly via close button
+        print("  -> Closing B2B modal...")
+        close_btn = page.locator("#b2b-close-btn")
+        if close_btn.count() > 0 and close_btn.first.is_visible():
+            click_locator_with_ripple(page, close_btn.first, delay_after=0.8)
+
+        # Triple-check: if modal is still open, close it via state / backdrop click!
+        page.evaluate("""(
+            () => {
+                const btn = document.getElementById('b2b-close-btn') || document.getElementById('b2b-close-x-btn');
+                if (btn) btn.click();
+                else {
+                    const modal = document.getElementById('b2b-modal');
+                    if (modal) modal.click();
+                }
+            }
+        )()""")
+        time.sleep(0.8)
 
         # Reset camera
         page.evaluate("window.cameraReset(600)")
         time.sleep(0.8)
 
         # Scroll up to trigger batch sweep button
-        page.mouse.wheel(0, -220)
+        page.mouse.wheel(0, -350)
         time.sleep(1.5)
-
         # Click "Optimize Subscriptions" batch sweep button
         sweep_btn = page.locator("button:has-text('Optimize')")
         if sweep_btn.count() > 0:
@@ -736,21 +791,22 @@ def record_session():
             print("  -> Opening Certified CFO Boardpack modal...")
             click_locator_with_ripple(page, cfo_btn.first, delay_after=2.2)
 
-            # Dynamic camera zoom on the CFO Boardpack modal
-            page.evaluate("window.cameraZoomTo('#cfo-modal', 1.15, 600, false)")
-            time.sleep(2.5)
+            # Clear stage transform to 'none' so CFO modal is 100% dead center
+            page.evaluate("""
+                (() => {
+                    const stage = document.getElementById('root') || document.body;
+                    stage.style.transform = 'none';
+                })()
+            """)
+            time.sleep(0.5)
 
             # Hover KPI benchmark grid inside CFO Boardpack
             bench_grid = page.locator("#cfo-modal").get_by_text("Baseline Spend").first
-            move_to_locator(page, bench_grid, offset_x=0.5, offset_y=1.5, delay_after=3.0)
+            move_to_locator(page, bench_grid, offset_x=0.5, offset_y=1.5, delay_after=2.5)
 
             # Hover cryptographic SHA-256 chain verification badge
             sha_badge = page.locator("#cfo-modal").get_by_text("Cryptographic SHA-256 Chain Verified").first
-            move_to_locator(page, sha_badge, offset_x=0.5, offset_y=0.5, delay_after=3.0)
-
-            # Reset camera before closing modal
-            page.evaluate("window.cameraReset(500)")
-            time.sleep(0.6)
+            move_to_locator(page, sha_badge, offset_x=0.5, offset_y=0.5, delay_after=2.5)
 
             # Close CFO Modal
             cfo_close = page.locator("#cfo-modal button:has-text('Print')").locator("xpath=..").locator("button").last
@@ -767,17 +823,25 @@ def record_session():
             time.sleep(0.5)
 
         # Reset camera
-        page.evaluate("window.cameraReset(600)")
-        time.sleep(1.0)
+        page.evaluate("window.cameraReset(400)")
+        time.sleep(0.5)
 
-        # Final showcase hover on top brand bar
-        brand_final = page.locator("span:has-text('SentinelPay')").first
-        move_to_locator(page, brand_final, offset_x=0.5, offset_y=0.5, delay_after=2.0)
+        # Final Keynote Conclusion Slide: Thank You & Credits
+        print("  -> Displaying Final Keynote Slide: Thank You & Architecture Credits...")
+        page.evaluate("""
+            window.showSlide(
+                'CONCLUSION • SENTINELPAY AI',
+                'Thank You',
+                'Autonomous PayPal Treasury & Agentic Commerce Copilot • PayPal AI Hackathon 2026',
+                8000,
+                true
+            )
+        """)
 
-        # Synchronize with master audio duration (~173.0s)
+        # Synchronize with master audio duration (~172.5s)
         elapsed = time.time() - start_time
-        if elapsed < 173.0:
-            time.sleep(173.0 - elapsed)
+        if elapsed < 172.5:
+            time.sleep(172.5 - elapsed)
 
         print(f"\nChoreographed recording completed in {time.time() - start_time:.2f}s!")
 

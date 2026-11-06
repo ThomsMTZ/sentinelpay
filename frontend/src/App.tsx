@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import {
   CheckCircle2,
@@ -1786,7 +1787,7 @@ export default function App() {
       </main>
 
       {/* Credentials Configuration Modal Sheet */}
-      {showCredentialsModal && (
+      {showCredentialsModal && typeof document !== 'undefined' && createPortal(
         <div onClick={() => setShowCredentialsModal(false)} className="fixed inset-0 z-50 bg-[#0C121D]/40 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer">
           <div onClick={(e) => e.stopPropagation()} className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl spring-settle cursor-default">
             <div className="flex items-center justify-between">
@@ -1878,11 +1879,12 @@ export default function App() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Corporate CFO Audit Boardpack Modal */}
-      {showCFOModal && cfoBoardpack && (
+      {showCFOModal && cfoBoardpack && typeof document !== 'undefined' && createPortal(
         <div id="cfo-modal" onClick={() => setShowCFOModal(false)} className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto cursor-pointer">
           <div onClick={(e) => e.stopPropagation()} className="bg-white border border-[#E2E8F0] rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl my-8 spring-settle cursor-default">
             <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-4">
@@ -2060,11 +2062,12 @@ export default function App() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* B2B Retention Negotiation Modal */}
-      {negotiatingSub && (
+      {negotiatingSub && typeof document !== 'undefined' && createPortal(
         <div id="b2b-modal" onClick={() => setNegotiatingSub(null)} className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto cursor-pointer">
           <div onClick={(e) => e.stopPropagation()} className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 spring-settle cursor-default">
             <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-3">
@@ -2175,7 +2178,8 @@ export default function App() {
               </div>
             ) : null}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
