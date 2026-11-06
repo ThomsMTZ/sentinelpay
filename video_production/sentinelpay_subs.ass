@@ -1,0 +1,36 @@
+[Script Info]
+Title: SentinelPay Keynote Subtitles
+ScriptType: v4.00+
+WrapStyle: 0
+PlayResX: 1920
+PlayResY: 1080
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,34,&H00FFFFFF,&H000000FF,&H00000000,&H180C121D,-1,0,0,0,100,100,0.5,0,3,8.0,0,2,60,60,55,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:06.20,Default,,0,0,0,,Every year, companies and individuals waste over $135 billion on zombie SaaS subscriptions,
+Dialogue: 0,0:00:06.20,0:00:10.80,Default,,0,0,0,,underutilized team seats, and silent recurring price hikes.
+Dialogue: 0,0:00:10.80,0:00:17.50,Default,,0,0,0,,Meanwhile, autonomous AI agents are ready to buy compute—but no CFO will hand an unconstrained LLM raw access to a PayPal account.
+Dialogue: 0,0:00:17.50,0:00:23.80,Default,,0,0,0,,Welcome to SentinelPay: the autonomous PayPal Treasury and Agentic Commerce copilot,
+Dialogue: 0,0:00:23.80,0:00:32.30,Default,,0,0,0,,powered by Google Gemini and native PayPal Sandbox REST APIs.
+Dialogue: 0,0:00:33.30,0:00:38.50,Default,,0,0,0,,Let's start with our real-time defense: the Live Webhook Firewall.
+Dialogue: 0,0:00:38.50,0:00:46.00,Default,,0,0,0,,Watch what happens when a predatory merchant attempts an unauthorized $1 trial conversion into a recurring $49 charge.
+Dialogue: 0,0:00:46.00,0:00:53.20,Default,,0,0,0,,The moment the signed PayPal webhook hits our system, SentinelPay verifies the signature and suspends the billing agreement.
+Dialogue: 0,0:00:53.20,0:01:02.00,Default,,0,0,0,,It triggers an instant clawback refund via PayPal's Captures Refund API v2 in under 100 milliseconds.
+Dialogue: 0,0:01:02.00,0:01:10.02,Default,,0,0,0,,With our PayPal Developer X-Ray, inspect the raw JSON receipt, HATEOAS links, and verified idempotency keys.
+Dialogue: 0,0:01:11.02,0:01:17.20,Default,,0,0,0,,Next, SentinelPay continuously audits active subscriptions against real usage telemetry.
+Dialogue: 0,0:01:17.20,0:01:23.50,Default,,0,0,0,,Instead of just cutting tools, SentinelPay offers 1-Click SaaS Arbitrage.
+Dialogue: 0,0:01:23.50,0:01:31.80,Default,,0,0,0,,It cancels overpriced CloudGPU Pro at $89/mo and provisions an equivalent RunPod serverless cluster for $19 via PayPal Orders v2—saving $840/year.
+Dialogue: 0,0:01:31.80,0:01:39.00,Default,,0,0,0,,For active tools like DesignFlow Enterprise, our Gemini Copilot initiates an active B2B retention negotiation.
+Dialogue: 0,0:01:39.00,0:01:46.50,Default,,0,0,0,,It drafts a formal notice citing actual usage, secures a 40% enterprise discount, and applies it directly via the Subscriptions Revise API.
+Dialogue: 0,0:01:46.50,0:01:54.50,Default,,0,0,0,,With our Autonomous Sweep, one click cleans up dormant zombies and flips our Financial Health Score from 38 to 98.
+Dialogue: 0,0:01:55.50,0:02:02.80,Default,,0,0,0,,For outbound Agentic Commerce, our deterministic Budget Guardrails protect autonomous spending.
+Dialogue: 0,0:02:02.80,0:02:11.20,Default,,0,0,0,,A $19.50 GPU credit top-up is auto-approved under our $25 threshold and captured via PayPal Orders v2.
+Dialogue: 0,0:02:11.20,0:02:18.50,Default,,0,0,0,,A $65 token pack requires human approval and is queued for a safe 1-click confirmation.
+Dialogue: 0,0:02:18.50,0:02:26.00,Default,,0,0,0,,SentinelPay also exposes a full Model Context Protocol server, enabling external AI agents in Claude or Cursor to command PayPal safely.
+Dialogue: 0,0:02:26.00,0:02:34.00,Default,,0,0,0,,Finally, the CFO can generate a certified, board-ready audit pack complete with before-and-after spend benchmarks and SHA-256 proof.
+Dialogue: 0,0:02:34.00,0:02:42.50,Default,,0,0,0,,SentinelPay turns PayPal into the trusted operating system for autonomous commerce.

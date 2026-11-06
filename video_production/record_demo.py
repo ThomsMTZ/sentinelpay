@@ -12,19 +12,20 @@ if sys.platform == "win32":
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
         pass
+
 import imageio_ffmpeg
 from playwright.sync_api import sync_playwright
 
 FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
 
 # =============================================================================
-# Big Tech & Apple-Grade Presentation Injections (Cursor, Zoom, Chapters)
+# Big Tech Keynote Engine: Full-Screen Slide Cards, Vector Cursor & Dynamic Zoom
 # =============================================================================
-APPLE_PRESENTATION_SCRIPT = """
+KEYNOTE_PRESENTATION_SCRIPT = """
 (() => {
   if (document.getElementById('apple-motion-cursor')) return;
 
-  // 1. Inject Styles for Apple Cursor, Ripple Physics & Chapter Cards
+  // 1. Inject Styles for Apple Cursor, Ripple Physics & Keynote Slide Transitions
   const style = document.createElement('style');
   style.id = 'apple-motion-styles';
   style.textContent = `
@@ -69,76 +70,83 @@ APPLE_PRESENTATION_SCRIPT = """
       transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease-out, border-width 0.65s ease;
     }
 
-    /* Chapter Card (Dynamic Island Keynote Architecture) */
-    #apple-chapter-container {
+    /* Full-Screen Keynote Title Slide (Diapositive Fond Blanc Style Big Tech) */
+    #keynote-slide-overlay {
       position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-40px) scale(0.95);
-      opacity: 0;
-      filter: blur(8px);
+      inset: 0;
       z-index: 2147483640;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 80px;
+      opacity: 0;
       pointer-events: none;
-      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                  opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      transform: scale(0.98);
+      filter: blur(8px);
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
                   filter 0.5s ease;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
     }
-    #apple-chapter-container.active {
-      transform: translateX(-50%) translateY(0) scale(1);
+    #keynote-slide-overlay.active {
       opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
       filter: blur(0px);
     }
-    .chapter-card-pill {
-      position: relative;
-      background: rgba(12, 18, 29, 0.90);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-top: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 9999px;
-      padding: 10px 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 24px rgba(0, 112, 186, 0.32);
-      display: flex;
+    #keynote-slide-overlay.exiting {
+      opacity: 0;
+      transform: scale(1.04);
+      filter: blur(6px);
+    }
+    .slide-badge {
+      display: inline-flex;
       align-items: center;
-      gap: 14px;
-      overflow: hidden;
-    }
-    .chapter-badge {
-      background: linear-gradient(135deg, rgba(0, 112, 186, 0.45), rgba(0, 156, 222, 0.25));
-      border: 1px solid rgba(0, 156, 222, 0.55);
-      color: #38BDF8;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      letter-spacing: 0.04em;
-      font-variant-numeric: tabular-nums;
-    }
-    .chapter-kicker {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: rgba(255, 255, 255, 0.45);
-      line-height: 1;
-    }
-    .chapter-title {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: #FFFFFF;
-      line-height: 1.2;
-    }
-    .chapter-progress-line {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 2.5px;
-      background: linear-gradient(90deg, #0070BA, #009CDE, #38BDF8);
-      width: 0%;
+      gap: 10px;
+      padding: 7px 22px;
       border-radius: 9999px;
-      transition: width linear;
+      background: rgba(0, 112, 186, 0.08);
+      border: 1px solid rgba(0, 112, 186, 0.28);
+      color: #0070BA;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 26px;
+    }
+    .slide-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #0070BA;
+      box-shadow: 0 0 10px rgba(0, 112, 186, 0.6);
+    }
+    .slide-title {
+      font-size: 58px;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: #0C121D;
+      margin: 0 0 18px 0;
+      max-width: 1180px;
+      line-height: 1.12;
+    }
+    .slide-divider {
+      width: 84px;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #003087, #0070BA, #009CDE);
+      margin: 8px 0 24px 0;
+    }
+    .slide-subtitle {
+      font-size: 23px;
+      font-weight: 500;
+      color: #4A5568;
+      margin: 0;
+      max-width: 900px;
+      line-height: 1.5;
     }
   `;
   document.head.appendChild(style);
@@ -198,40 +206,39 @@ APPLE_PRESENTATION_SCRIPT = """
     cursor.classList.remove('clicking');
   });
 
-  // 3. Chapter Card Container Element
-  const chapterContainer = document.createElement('div');
-  chapterContainer.id = 'apple-chapter-container';
-  chapterContainer.innerHTML = `
-    <div class="chapter-card-pill">
-      <span class="chapter-badge" id="chap-num">01</span>
-      <div style="display:flex; flex-direction:column; gap:2px;">
-        <span class="chapter-kicker" id="chap-kicker">THREAT MITIGATION</span>
-        <span class="chapter-title" id="chap-title">Real-Time Webhook Firewall</span>
-      </div>
-      <div class="chapter-progress-line" id="chap-progress"></div>
+  // 3. Full-Screen Keynote Slide Element
+  const slideOverlay = document.createElement('div');
+  slideOverlay.id = 'keynote-slide-overlay';
+  slideOverlay.innerHTML = `
+    <div class="slide-badge">
+      <span class="slide-dot"></span>
+      <span id="slide-kicker-text">KEYNOTE OVERVIEW</span>
     </div>
+    <h1 class="slide-title" id="slide-title-text">Autonomous PayPal Treasury</h1>
+    <div class="slide-divider"></div>
+    <p class="slide-subtitle" id="slide-sub-text">Eliminating zombie SaaS waste</p>
   `;
-  document.body.appendChild(chapterContainer);
+  document.body.appendChild(slideOverlay);
 
-  window.showChapter = (num, kicker, title, duration = 6500) => {
-    document.getElementById('chap-num').textContent = num;
-    document.getElementById('chap-kicker').textContent = kicker;
-    document.getElementById('chap-title').textContent = title;
+  window.showSlide = (kicker, title, subtitle, duration = 3000) => {
+    document.getElementById('slide-kicker-text').textContent = kicker;
+    document.getElementById('slide-title-text').textContent = title;
+    document.getElementById('slide-sub-text').textContent = subtitle;
 
-    const prog = document.getElementById('chap-progress');
-    prog.style.transition = 'none';
-    prog.style.width = '0%';
+    slideOverlay.classList.remove('exiting');
+    slideOverlay.classList.add('active');
 
-    chapterContainer.classList.add('active');
+    if (window._slideExitTimeout) clearTimeout(window._slideExitTimeout);
+    if (window._slideDoneTimeout) clearTimeout(window._slideDoneTimeout);
 
-    requestAnimationFrame(() => {
-      prog.style.transition = `width ${duration}ms linear`;
-      prog.style.width = '100%';
-    });
+    // Begin smooth dissolve into live video
+    window._slideExitTimeout = setTimeout(() => {
+      slideOverlay.classList.remove('active');
+      slideOverlay.classList.add('exiting');
+    }, Math.max(duration - 600, 1000));
 
-    if (window._chapTimeout) clearTimeout(window._chapTimeout);
-    window._chapTimeout = setTimeout(() => {
-      chapterContainer.classList.remove('active');
+    window._slideDoneTimeout = setTimeout(() => {
+      slideOverlay.classList.remove('exiting');
     }, duration);
   };
 
@@ -311,7 +318,7 @@ def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
         page._last_mouse_pos = (x2, y2)
         return
 
-    # Perpendicular control point deflection for natural biological trajectory
+    # Perpendicular control point deflection for natural trajectory
     perp_scale = min(40, dist * 0.18) * (1 if random.random() > 0.5 else -1)
     norm = max(dist, 1)
     x1 = (x0 + x2) / 2 - (dy / norm) * perp_scale
@@ -322,7 +329,6 @@ def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
 
     for i in range(1, actual_steps + 1):
         t = i / actual_steps
-        # Smooth ease-out deceleration curve
         t_curved = math.sin(t * math.pi / 2)
 
         xt = (1 - t_curved) ** 2 * x0 + 2 * (1 - t_curved) * t_curved * x1 + t_curved ** 2 * x2
@@ -356,7 +362,6 @@ def click_locator_with_ripple(page, locator, delay_after=1.2):
 
 def record_session():
     os.makedirs("video_production/raw_video", exist_ok=True)
-    # Clear old webm files
     for old_file in glob.glob("video_production/raw_video/*.webm"):
         try:
             os.remove(old_file)
@@ -391,25 +396,34 @@ def record_session():
 
         print("Navigating to SentinelPay Web Interface (http://127.0.0.1:5173)...")
         page.goto("http://127.0.0.1:5173", wait_until="networkidle")
-        page.evaluate(APPLE_PRESENTATION_SCRIPT)
-        time.sleep(1.2)
+        page.evaluate(KEYNOTE_PRESENTATION_SCRIPT)
+        time.sleep(1.0)
 
         start_time = time.time()
-        print("Recording started at t=0s with Apple-grade keynote motion engine...")
+        print("Recording started at t=0s with Keynote Slide Transitions & Apple Motion Engine...")
 
         # -------------------------------------------------------------
         # SCENE 1: The Hook & Overview (0s to ~33.3s)
         # -------------------------------------------------------------
         print("\n[SCENE 1] Hook & Overview (0s - 33.3s)...")
-        page.evaluate("window.showChapter('01', 'AUTONOMOUS TREASURY', 'Autonomous PayPal Treasury Copilot', 7500)")
+        print("  -> Displaying Slide 1: Introduction Title Slide...")
+        page.evaluate("""
+            window.showSlide(
+                'KEYNOTE OVERVIEW • ARCHITECTURE',
+                'Autonomous PayPal Treasury & Agentic Commerce',
+                'Eliminating zombie SaaS waste & policy-guarding autonomous AI spending with PayPal Sandbox APIs',
+                3200
+            )
+        """)
+        time.sleep(3.2)  # Wait for slide presentation and smooth dissolve
 
         # Hover brand title & PayPal badge
         human_move(page, 220, 32)
-        time.sleep(3.0)
+        time.sleep(2.5)
 
         # Hover connection status pill
         human_move(page, 950, 32)
-        time.sleep(2.5)
+        time.sleep(2.0)
 
         # Dynamic zoom on KPI financial synthesis banner
         print("  -> Dynamic zoom onto #kpi-banner (scale: 1.15)...")
@@ -432,7 +446,7 @@ def record_session():
         page.evaluate("window.cameraReset(650)")
         time.sleep(0.8)
 
-        # Smooth scroll down to showcase the 6 subscriptions
+        # Smooth scroll down to showcase the subscriptions
         page.mouse.wheel(0, 160)
         time.sleep(1.5)
         human_move(page, 400, 380)
@@ -453,7 +467,16 @@ def record_session():
         # SCENE 2: Live Webhook Trap & Instant Refund (33.3s to ~71.0s)
         # -------------------------------------------------------------
         print("\n[SCENE 2] Live Webhook Firewall & Instant Refund (33.3s - 71.0s)...")
-        page.evaluate("window.showChapter('02', 'REAL-TIME THREAT DEFENSE', 'Live Webhook Firewall & Instant Refund', 8000)")
+        print("  -> Displaying Slide 2: Webhook Firewall Title Slide...")
+        page.evaluate("""
+            window.showSlide(
+                'PART 01 • REAL-TIME THREAT DEFENSE',
+                'Real-Time PayPal Webhook Firewall',
+                'Zero-trust interception of stealth price hikes & instant clawback refund via Captures API v2 in under 100ms',
+                3400
+            )
+        """)
+        time.sleep(3.4)  # Slide presentation and dissolve
 
         # Zoom into the Webhook Firewall section
         print("  -> Dynamic zoom onto #webhook-firewall (scale: 1.25)...")
@@ -470,7 +493,6 @@ def record_session():
             print("  -> Clicking 'Simulate Trial Trap'...")
             click_locator_with_ripple(page, trap_button.first, delay_after=1.8)
         else:
-            print("  -> Fallback: locating trial trap button...")
             fallback = page.locator("button:has-text('Simuler piège fin')")
             if fallback.count() > 0:
                 click_locator_with_ripple(page, fallback.first, delay_after=1.8)
@@ -506,7 +528,16 @@ def record_session():
         # SCENE 3: SaaS Arbitrage & Gemini B2B Negotiation (71.0s to ~124.6s)
         # -------------------------------------------------------------
         print("\n[SCENE 3] 1-Click SaaS Arbitrage & B2B Negotiation (71.0s - 124.6s)...")
-        page.evaluate("window.showChapter('03', 'SAAS ARBITRAGE & RETENTION', '1-Click Arbitrage & Gemini B2B Negotiation', 8000)")
+        print("  -> Displaying Slide 3: SaaS Arbitrage & B2B Negotiation Slide...")
+        page.evaluate("""
+            window.showSlide(
+                'PART 02 • TREASURY OPTIMIZATION',
+                '1-Click SaaS Arbitrage & Gemini B2B Negotiation',
+                'Autonomous subscription replacement via Orders v2 & -40% enterprise discount via /revise',
+                3400
+            )
+        """)
+        time.sleep(3.4)  # Slide presentation and dissolve
 
         # Scroll down slightly to align Subscriptions Ledger
         page.mouse.wheel(0, 220)
@@ -523,7 +554,7 @@ def record_session():
             print("  -> Expanding CloudGPU Pro telemetry...")
             click_locator_with_ripple(page, gpu_row, delay_after=1.8)
 
-        # Hover over 1-Click SaaS Switch Arbitrage card
+        # Click 1-Click SaaS Switch Arbitrage card
         time.sleep(1.5)
         switch_btn = page.locator("button:has-text('Switch to RunPod')")
         if switch_btn.count() > 0:
@@ -554,7 +585,7 @@ def record_session():
                 print("  -> Applying 40% discount on PayPal via /revise...")
                 click_locator_with_ripple(page, apply_btn.first, delay_after=2.0)
 
-            # Close negotiation modal if still open
+            # Close negotiation modal
             close_modal = page.locator("button:has-text('Close')")
             if close_modal.count() > 0:
                 click_locator_with_ripple(page, close_modal.first, delay_after=1.0)
@@ -587,7 +618,16 @@ def record_session():
         # SCENE 4: Agentic Commerce & Certified CFO Boardpack (124.6s to ~173.0s)
         # -------------------------------------------------------------
         print("\n[SCENE 4] Agentic Commerce & CFO Boardpack (124.6s - 173.0s)...")
-        page.evaluate("window.showChapter('04', 'AGENTIC COMMERCE', 'Zero-Trust Budget Guardrails & Orders v2', 8000)")
+        print("  -> Displaying Slide 4: Budget Guardrails Title Slide...")
+        page.evaluate("""
+            window.showSlide(
+                'PART 03 • AGENTIC COMMERCE & MCP',
+                'Zero-Trust Budget Guardrails & Orders v2',
+                'Policy-guarded autonomous procurement and standard Model Context Protocol for external AI agents',
+                3400
+            )
+        """)
+        time.sleep(3.4)  # Slide presentation and dissolve
 
         # Zoom into Guardrails & Purchases Panel
         print("  -> Dynamic zoom onto #guardrails-panel (scale: 1.25)...")
@@ -616,8 +656,17 @@ def record_session():
         page.evaluate("window.cameraReset(600)")
         time.sleep(1.2)
 
-        # Display Chapter 5: CFO Governance
-        page.evaluate("window.showChapter('05', 'AUDIT & GOVERNANCE', 'Certified CFO Boardpack with SHA-256 Proof', 7500)")
+        # Display Slide 5: Corporate Governance & CFO Boardpack
+        print("  -> Displaying Slide 5: CFO Governance Slide...")
+        page.evaluate("""
+            window.showSlide(
+                'PART 04 • CORPORATE GOVERNANCE',
+                'Certified CFO Boardpack with SHA-256 Proof',
+                'Cryptographically verified before-and-after spend benchmarks and board-ready financial certification',
+                3200
+            )
+        """)
+        time.sleep(3.2)  # Slide presentation and dissolve
 
         # Scroll to top to access header button
         page.mouse.wheel(0, -300)
@@ -673,26 +722,19 @@ def merge_video_and_audio():
 
     raw_video = max(video_files, key=os.path.getctime)
     master_audio = "video_production/audio/master_voiceover.mp3"
-    subs_file = "video_production/sentinelpay_subs.srt"
+    ass_file = "video_production/sentinelpay_subs.ass"
     output_mp4 = "sentinelpay_demo.mp4"
 
     # Forward slash path for FFmpeg subtitles filter
-    subs_formatted = subs_file.replace("\\", "/")
+    ass_formatted = ass_file.replace("\\", "/")
 
-    print(f"\nMerging {raw_video} with {master_audio} and burning subtitles ({subs_file}) into {output_mp4}...")
-
-    # High-accessibility Apple-style subtitles: pure white bold text on semi-transparent dark obsidian pill
-    subtitles_filter = (
-        f"subtitles={subs_formatted}:force_style="
-        "'Fontname=Arial,FontSize=20,PrimaryColour=&H00FFFFFF,BackColour=&HB00C121D,"
-        "BorderStyle=3,Outline=0,Shadow=0,MarginV=44,Alignment=2,Bold=1,Spacing=0.5'"
-    )
+    print(f"\nMerging {raw_video} with {master_audio} and burning high-contrast ASS subtitles into {output_mp4}...")
 
     cmd = [
         FFMPEG_EXE, "-y",
         "-i", raw_video,
         "-i", master_audio,
-        "-vf", subtitles_filter,
+        "-vf", f"subtitles={ass_formatted}",
         "-c:v", "libx264",
         "-preset", "medium",
         "-crf", "19",
@@ -705,7 +747,7 @@ def merge_video_and_audio():
 
     subprocess.run(cmd, check=True)
     size_mb = os.path.getsize(output_mp4) / (1024 * 1024)
-    print(f"\nSUCCESS! Master Big Tech demo video produced with subtitles: {output_mp4} ({size_mb:.2f} MB)")
+    print(f"\nSUCCESS! Master Big Tech demo video produced with slide transitions & high-contrast subtitles: {output_mp4} ({size_mb:.2f} MB)")
 
 
 if __name__ == "__main__":
