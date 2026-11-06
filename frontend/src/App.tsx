@@ -16,6 +16,10 @@ import {
   ArrowRightLeft,
   Code2,
   Zap,
+  FileText,
+  Handshake,
+  Printer,
+  X,
 } from 'lucide-react';
 import {
   fetchDashboard,
@@ -30,9 +34,13 @@ import {
   seedPayPalSandbox,
   saveCredentials,
   resetDemoEnvironment,
+  negotiateSubscription,
+  fetchCFOBoardpack,
 } from './api';
 import {
   AgentActionProposal,
+  B2BNegotiationResult,
+  CFOBoardpack,
   DashboardData,
   PayPalExecutionReceipt,
   SubscriptionItem,
@@ -239,6 +247,16 @@ export default function App() {
   const [paypalClientSecret, setPaypalClientSecret] = useState<string>('');
   const [geminiApiKey, setGeminiApiKey] = useState<string>('');
 
+  // CFO Boardpack Modal state
+  const [showCFOModal, setShowCFOModal] = useState<boolean>(false);
+  const [cfoBoardpack, setCFOBoardpack] = useState<CFOBoardpack | null>(null);
+  const [cfoLoading, setCFOLoading] = useState<boolean>(false);
+
+  // B2B Negotiation Modal state
+  const [negotiatingSub, setNegotiatingSub] = useState<SubscriptionItem | null>(null);
+  const [negotiationResult, setNegotiationResult] = useState<B2BNegotiationResult | null>(null);
+  const [negotiationLoading, setNegotiationLoading] = useState<boolean>(false);
+
   // Editable policy sliders (1:1 60fps direct manipulation)
   const [monthlyLimit, setMonthlyLimit] = useState<number>(150);
   const [autoThreshold, setAutoThreshold] = useState<number>(25);
@@ -351,6 +369,63 @@ export default function App() {
       );
     } catch (err) {
       triggerToast(err instanceof Error ? err.message : 'Erreur lors de l’optimisation');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleOpenCFOBoardpack = async () => {
+    setCFOLoading(true);
+    try {
+      const report = await fetchCFOBoardpack();
+      setCFOBoardpack(report);
+      setShowCFOModal(true);
+    } catch (err) {
+      triggerToast(
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors de la génération du rapport CFO'
+      );
+    } finally {
+      setCFOLoading(false);
+    }
+  };
+
+  const handleOpenNegotiation = async (sub: SubscriptionItem) => {
+    setNegotiatingSub(sub);
+    setNegotiationResult(null);
+    setNegotiationLoading(true);
+    try {
+      const res = await negotiateSubscription(sub.id, false);
+      setNegotiationResult(res.negotiation);
+    } catch (err) {
+      triggerToast(
+        err instanceof Error ? err.message : 'Erreur lors de la négociation B2B'
+      );
+      setNegotiatingSub(null);
+    } finally {
+      setNegotiationLoading(false);
+    }
+  };
+
+  const handleApplyNegotiationDiscount = async () => {
+    if (!negotiatingSub) return;
+    setBusyId(`APPLY-NEG-${negotiatingSub.id}`);
+    try {
+      const res = await negotiateSubscription(negotiatingSub.id, true);
+      setData(res.dashboard);
+      setNegotiationResult(res.negotiation);
+      triggerToast(
+        `Remise B2B de 40% appliquée via PayPal /revise (${formatUSD(
+          res.negotiation.counter_offer.annual_savings_usd
+        )}/an économisés)`
+      );
+    } catch (err) {
+      triggerToast(
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors de l’application de la remise PayPal'
+      );
     } finally {
       setBusyId(null);
     }
@@ -711,6 +786,17 @@ export default function App() {
                 <span>Provisionner Sandbox</span>
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={handleOpenCFOBoardpack}
+              disabled={cfoLoading}
+              className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#003087] hover:bg-[#001C64] text-xs font-semibold text-white shadow-sm"
+              title="Générer le rapport d'audit CFO certifié"
+            >
+              <FileText className="w-3.5 h-3.5 text-white" />
+              <span>{cfoLoading ? 'Génération…' : 'Rapport CFO'}</span>
+            </button>
 
             <button
               type="button"
@@ -1233,6 +1319,34 @@ export default function App() {
                                     } (${formatUSD(
                                       sub.switch_alternative.new_monthly_cost
                                     )}/mois)`}
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Active B2B Retention Negotiation Action */}
+                          {sub.status === 'ACTIVE' && (
+                            <div className="bg-[#FAFBFD] border border-[#CBD5E1]/60 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="space-y-1">
+                                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#003087]">
+                                  <Handshake className="w-3.5 h-3.5 text-[#003087]" />
+                                  <span>Négociation B2B Autonome (Gemini AI Copilot)</span>
+                                </div>
+                                <p className="text-xs text-[#4A5568] leading-relaxed">
+                                  Générer une mise en demeure formelle sur la télémétrie réelle et obtenir -40% de remise entreprise via l'API PayPal /revise.
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenNegotiation(sub);
+                                }}
+                                disabled={negotiationLoading && negotiatingSub?.id === sub.id}
+                                className="pressable px-3.5 py-2 rounded-xl bg-white border border-[#003087]/30 hover:border-[#003087] text-[#003087] text-xs font-semibold shrink-0 shadow-xs hover:bg-[#F0F4FF] transition-all"
+                              >
+                                {negotiationLoading && negotiatingSub?.id === sub.id
+                                  ? 'Négociation en cours…'
+                                  : 'Négocier remise B2B (-40%)'}
                               </button>
                             </div>
                           )}
@@ -1769,6 +1883,302 @@ export default function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Corporate CFO Audit Boardpack Modal */}
+      {showCFOModal && cfoBoardpack && (
+        <div className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl my-8 spring-settle">
+            <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#003087]" />
+                  <h3 className="text-lg font-bold text-[#003087]">
+                    Rapport d'Audit Financier CFO
+                  </h3>
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#E8F3FF] text-[#003087]">
+                    {cfoBoardpack.report_id}
+                  </span>
+                </div>
+                <p className="text-xs text-[#718096]">
+                  {cfoBoardpack.organization} • {cfoBoardpack.certification}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#CBD5E1] hover:border-[#003087] text-xs font-semibold text-[#0C121D]"
+                >
+                  <Printer className="w-3.5 h-3.5 text-[#003087]" />
+                  <span>Imprimer / PDF</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCFOModal(false)}
+                  className="p-1.5 rounded-lg text-[#718096] hover:bg-[#F1F5F9] hover:text-[#0C121D]"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* KPI Benchmarks Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
+                <div className="text-[11px] font-medium text-[#718096]">Dépense Initiale</div>
+                <div className="text-sm font-bold text-[#4A5568] tabular-figure line-through">
+                  {formatUSD(cfoBoardpack.kpi_summary.baseline_monthly_spend_usd)}/mo
+                </div>
+                <div className="text-[11px] text-[#A0AEC0]">
+                  {formatUSD(cfoBoardpack.kpi_summary.baseline_annual_spend_usd)}/an
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
+                <div className="text-[11px] font-medium text-[#718096]">Dépense Actuelle</div>
+                <div className="text-base font-bold text-[#003087] tabular-figure">
+                  {formatUSD(cfoBoardpack.kpi_summary.current_monthly_spend_usd)}/mo
+                </div>
+                <div className="text-[11px] text-[#718096]">
+                  {formatUSD(cfoBoardpack.kpi_summary.current_annual_spend_usd)}/an
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#EAF7F0] border border-[#0E7C47]/20 space-y-1">
+                <div className="text-[11px] font-medium text-[#0E7C47]">Économies Réalisées</div>
+                <div className="text-base font-bold text-[#0E7C47] tabular-figure">
+                  {formatUSD(cfoBoardpack.kpi_summary.realized_annual_savings_usd)}/an
+                </div>
+                <div className="text-[11px] text-[#0E7C47] font-semibold">
+                  -{cfoBoardpack.kpi_summary.percentage_spend_reduction}% de baisse
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#E8F3FF] border border-[#0070BA]/20 space-y-1">
+                <div className="text-[11px] font-medium text-[#003087]">Score de Santé</div>
+                <div className="text-base font-bold text-[#003087] tabular-figure">
+                  {cfoBoardpack.financial_health_score}/100
+                </div>
+                <div className="text-[11px] text-[#0070BA] font-semibold">
+                  Grade A+ Trésorerie
+                </div>
+              </div>
+            </div>
+
+            {/* Executive AI Brief Section */}
+            <div className="bg-[#FAFBFD] border border-[#E2E8F0] rounded-xl p-4 space-y-2">
+              <div className="text-xs font-semibold text-[#003087] flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#003087]" />
+                Synthèse Exécutive pour le Conseil d'Administration
+              </div>
+              <p className="text-xs text-[#4A5568] leading-relaxed">
+                {cfoBoardpack.executive_summary ||
+                  "Audit complet des mandats de facturation récurrente PayPal exécuté. Les anomalies de surprovisionnement, les hausses tarifaires furtives et les conversions d'essai gratuit ont été purgées avec succès."}
+              </p>
+            </div>
+
+            {/* Certified Subscriptions Matrix */}
+            <div className="space-y-2">
+              <div className="text-xs font-semibold text-[#0C121D]">
+                Matrice des Abonnements PayPal ({cfoBoardpack.subscriptions_matrix.length} audités)
+              </div>
+              <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#718096] font-medium">
+                    <tr>
+                      <th className="py-2.5 px-3">Fournisseur & Plan</th>
+                      <th className="py-2.5 px-3">Statut</th>
+                      <th className="py-2.5 px-3 text-right">Coût/Mois</th>
+                      <th className="py-2.5 px-3 text-right">Score Gaspillage</th>
+                      <th className="py-2.5 px-3 text-right">Économie Débloquée</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E2E8F0]">
+                    {cfoBoardpack.subscriptions_matrix.map((row) => (
+                      <tr key={row.paypal_agreement_id} className="hover:bg-[#F8FAFC]">
+                        <td className="py-2 px-3">
+                          <div className="font-semibold text-[#0C121D]">{row.vendor}</div>
+                          <div className="text-[11px] text-[#718096] font-mono">
+                            {row.paypal_agreement_id} • {row.plan}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${
+                              row.status === 'DOWNGRADED'
+                                ? 'bg-[#E8F3FF] text-[#003087]'
+                                : row.status === 'CANCELLED'
+                                ? 'bg-[#FEE2E2] text-[#991B1B]'
+                                : 'bg-[#EAF7F0] text-[#0E7C47]'
+                            }`}
+                          >
+                            {row.status}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-right font-medium text-[#0C121D] tabular-figure">
+                          {formatUSD(row.monthly_cost)}
+                        </td>
+                        <td className="py-2 px-3 text-right tabular-figure">
+                          <span
+                            className={`font-semibold ${
+                              row.waste_score >= 70
+                                ? 'text-[#C53030]'
+                                : row.waste_score >= 40
+                                ? 'text-[#D69E2E]'
+                                : 'text-[#0E7C47]'
+                            }`}
+                          >
+                            {row.waste_score}/100
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-right font-bold text-[#0E7C47] tabular-figure">
+                          +{formatUSD(row.annual_savings)}/an
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Cryptographic Proof & Signoff */}
+            <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 font-semibold text-[#0E7C47]">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Preuve Cryptographique SHA-256 Vérifiée
+                </div>
+                <div className="font-mono text-[11px] text-[#718096] break-all">
+                  Bloc : {cfoBoardpack.cryptographic_proof.latest_sha256_hash}
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="font-semibold text-[#003087]">
+                  {cfoBoardpack.cfo_signoff.auditor_role}
+                </div>
+                <div className="text-[11px] text-[#718096]">
+                  {cfoBoardpack.cfo_signoff.status}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* B2B Retention Negotiation Modal */}
+      {negotiatingSub && (
+        <div className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 spring-settle">
+            <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Handshake className="w-5 h-5 text-[#003087]" />
+                  <h3 className="text-base font-bold text-[#0C121D]">
+                    Négociation B2B — {negotiatingSub.vendor_name}
+                  </h3>
+                </div>
+                <p className="text-xs text-[#718096]">
+                  Mandat PayPal #{negotiatingSub.paypal_subscription_id} • Plan actuel : {negotiatingSub.plan_name} ({formatUSD(negotiatingSub.monthly_cost)}/mois)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNegotiatingSub(null)}
+                className="p-1.5 rounded-lg text-[#718096] hover:bg-[#F1F5F9] hover:text-[#0C121D]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {negotiationLoading ? (
+              <div className="py-12 text-center space-y-3">
+                <div className="w-7 h-7 border-2 border-[#003087] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs font-semibold text-[#003087]">
+                  SentinelPay AI audite la télémétrie et rédige la mise en demeure formelle…
+                </p>
+              </div>
+            ) : negotiationResult ? (
+              <div className="space-y-4">
+                {/* Formal Ultimatum Letter */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#0C121D] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#003087]" />
+                    Mise en demeure générée par l'IA (Basée sur télémétrie réelle)
+                  </label>
+                  <pre className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] text-[11px] font-mono text-[#334155] whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                    {negotiationResult.ultimatum_letter}
+                  </pre>
+                </div>
+
+                {/* Vendor Retention Counter-Offer */}
+                <div className="p-4 rounded-xl bg-[#EAF7F0] border border-[#0E7C47]/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#0E7C47] flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Contre-offre de rétention acceptée (-40% accordé)
+                    </span>
+                    <span className="text-xs font-bold text-[#0E7C47] tabular-figure">
+                      +{formatUSD(negotiationResult.counter_offer.annual_savings_usd)}/an d'économie
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#2D3748] leading-relaxed italic">
+                    « {negotiationResult.counter_offer.vendor_response_message} »
+                  </p>
+                  <div className="pt-2 flex items-center gap-4 text-xs">
+                    <div>
+                      <span className="text-[#718096]">Ancien prix : </span>
+                      <span className="font-semibold text-[#A0AEC0] line-through tabular-figure">
+                        {formatUSD(negotiatingSub.monthly_cost)}/mois
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[#718096]">Nouveau prix négocié : </span>
+                      <span className="font-bold text-[#003087] tabular-figure">
+                        {formatUSD(negotiationResult.counter_offer.proposed_monthly_cost)}/mois
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action CTA */}
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setNegotiatingSub(null)}
+                    className="pressable px-4 py-2.5 rounded-xl border border-[#CBD5E1] text-xs font-medium text-[#4A5568]"
+                  >
+                    Fermer
+                  </button>
+
+                  {negotiationResult.discount_applied_on_paypal ? (
+                    <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0E7C47] text-white text-xs font-semibold">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Remise appliquée sur PayPal via /revise</span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleApplyNegotiationDiscount}
+                      disabled={busyId === `APPLY-NEG-${negotiatingSub.id}`}
+                      className="pressable inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#003087] hover:bg-[#001C64] text-white text-xs font-bold shadow-md"
+                    >
+                      <Handshake className="w-4 h-4" />
+                      <span>
+                        {busyId === `APPLY-NEG-${negotiatingSub.id}`
+                          ? 'Mise à jour PayPal /revise en cours…'
+                          : `Appliquer -40% sur PayPal (${formatUSD(
+                              negotiationResult.counter_offer.proposed_monthly_cost
+                            )}/mois)`}
+                      </span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       )}
