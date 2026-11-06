@@ -21,6 +21,10 @@ Companies and consumers lose thousands of dollars every year to dormant "zombie"
    - **1-Click Human-in-the-Loop Approval (`> $25`):** Intercepts medium purchases (`e.g., $65`) and places them in a 1-Click Approval Queue before calling PayPal.
    - **Hard Budget Cap Enforcement:** Automatically blocks any purchase exceeding the remaining monthly budget (`e.g., $450`).
 4. **Cryptographic SHA-256 Audit Ledger:** Every AI thought, guardrail check, and PayPal Sandbox API receipt (`PayPal-Request-Id`, HTTP status, resource ID) is hash-chained (`prev_hash -> sha256_hash`) for tamper-evident financial compliance.
+5. **1-Click SaaS Arbitrage Auto-Switch:** Atomic cancellation of overpriced services (`/cancel`) and immediate procurement of equivalent cheaper alternatives via PayPal Orders v2.
+6. **Live PayPal Webhook Trap Interceptor:** Real-time defense against silent price hikes (+169%) and unauthorized trial conversions with instant refunds via PayPal Captures Refund API v2 (`/v2/payments/captures/{id}/refund`).
+7. **Active B2B Retention Negotiation & CFO Boardpack:** Automated ultimatum notices citing telemetry to secure 40% enterprise discounts via PayPal `/revise`, plus certified boardpacks for executive leadership.
+8. **Model Context Protocol (MCP) Server (`mcp_server.py`):** Standard JSON-RPC 2.0 stdio server enabling external AI agents (Claude Desktop, Cursor, OpenAI Agents) to inspect and command PayPal under zero-trust budget guardrails.
 
 ---
 
@@ -49,7 +53,7 @@ Hackathon/
 │   │   └── api/
 │   │       └── routes.py              # REST API Endpoints
 │   └── tests/
-│       └── test_sentinel_backend.py   # Automated Pytest Suite (6/6 passing)
+│       └── test_sentinel_backend.py   # Automated Pytest Suite (12/12 passing)
 └── frontend/
     └── src/
         ├── App.tsx                    # PayPal Institutional UI with Apple Fluid Craft
