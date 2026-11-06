@@ -21,3 +21,9 @@ frontend/dist/
 # Runtime state
 backend/data/*.json
 *.log
+
+# Video production raw files
+video_production/raw_video/
+video_production/audio/
+*.webm
+
