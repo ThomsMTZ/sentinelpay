@@ -24,23 +24,30 @@ We built **SentinelPay** to bridge that trust gap: combining **Google Gemini 2.5
 ### What it does
 **SentinelPay** is an autonomous treasury and procurement platform built natively on **PayPal Sandbox REST APIs**:
 
-1. **Telemetry-Driven Subscription Audit:**
+1. **Telemetry-Driven Subscription Audit & Revolut-Style Price Sparklines:**
    - Correlates active PayPal recurring billing agreements (`I-...`) with product usage telemetry (active days in the last 30 days, seat utilization ratio, functional overlap, and 90-day price creep).
    - Computes a `0–100` **Waste Score**, **Cost-per-Active-Day**, and exact **Annual Recoverable Savings** (`$2,682.00/year` on our benchmark portfolio).
+   - Displays Revolut-inspired price delta badges (+20% surge, -75% savings) and 6-month historical SVG sparklines.
 
 2. **Autonomous & 1-Click PayPal Subscription Remediation (`/v1/billing/subscriptions`):**
    - **Plan Downgrade via `/revise` (`POST /v1/billing/subscriptions/{id}/revise`):** Instead of blindly cancelling a needed tool, when SentinelPay detects that only `2 of 10 seats` are used on *DesignFlow Enterprise ($120/mo)*, it revises the PayPal Billing Plan down to the *Starter Duo Plan ($29/mo)*—saving **$1,092/year** with zero workflow disruption.
    - **Zombie Cancellation via `/cancel` (`POST /v1/billing/subscriptions/{id}/cancel`):** Terminates dormant services (*CloudGPU Studio Pro*, 52 days inactive, saving **$1,068/year**) and duplicate tools (*MeetScribe AI*, saving **$348/year**).
    - **Price-Creep Suspension via `/suspend` (`POST /v1/billing/subscriptions/{id}/suspend`):** Freezes recurring micro-subscriptions (*PulseMetrics*, +45% silent price hike with 0 usage) while preserving account state.
 
-3. **Policy-Guarded Agentic Commerce (`POST /v2/checkout/orders`):**
-   - Evaluates every autonomous purchase request against a deterministic **`BudgetGuardrailEngine`** before any PayPal API call can occur:
-     - **Tier 1 — Auto-Approved Micro-Checkout (`<= $25.00`):** Immediately creates and captures a PayPal Order v2 (e.g., `$19.50` serverless GPU top-up) when within the monthly autonomous cap (`$150.00`) and inside whitelisted vendor categories.
-     - **Tier 2 — 1-Click Human-in-the-Loop Approval (`> $25.00`):** Intercepts medium orders (e.g., `$65.00` production token pack) and places them in a **1-Click Approval Queue**. Once approved by the user, SentinelPay executes `POST /v2/checkout/orders` and returns the live PayPal Sandbox checkout link.
-     - **Tier 3 — Hard Cap Rejection:** Immediately blocks orders that exceed the remaining monthly budget (e.g., `$450.00` dedicated cluster) or fall outside whitelisted categories.
+3. **1-Click SaaS Arbitrage Auto-Switch (PayPal `/cancel` + Orders v2):**
+   - Automatically detects cheaper, feature-equivalent alternatives (e.g., replacing overpriced *CloudGPU Pro* at $89/mo with *RunPod Serverless GPU* at $19/mo).
+   - In a single atomic operation, cancels the legacy billing agreement via PayPal `/cancel` and provisions the cheaper tool via PayPal Orders v2, unlocking **$840/year net savings**.
 
-4. **Tamper-Evident SHA-256 Audit Trail:**
-   - Every AI reasoning step, guardrail evaluation, and PayPal Sandbox receipt (`PayPal-Request-Id`, HTTP status code, resource ID) is recorded in a **SHA-256 hash-chained ledger** (`prev_hash -> sha256_hash`).
+4. **Live PayPal Webhook Trap Interceptor & Instant Refund (`/v2/payments/captures/{id}/refund`):**
+   - Intercepts incoming signed PayPal Webhook events (`PAYMENT.SALE.COMPLETED` / `BILLING.SUBSCRIPTION.RENEWED`).
+   - Instantly traps unauthorized trial-to-paid conversions ($1.00 $\rightarrow$ $49.00/mo) and silent price hikes (+169%), automatically suspends the mandate, and executes a full clawback refund via PayPal Captures Refund API v2.
+
+5. **Active B2B Retention Negotiation & Certified CFO Audit Boardpack:**
+   - **Gemini B2B Negotiator:** Generates formal telemetry-backed ultimatum letters to vendor account teams citing active days, unused seats, and PayPal agreement IDs, securing 40% enterprise retention discounts applied directly via PayPal `/revise`.
+   - **Corporate CFO Boardpack:** Generates a printable, certified executive boardpack complete with before/after financial benchmarks, subscription matrices, and cryptographic SHA-256 ledger proof.
+
+6. **Model Context Protocol (MCP) Server for Autonomous Agents (`mcp_server.py`):**
+   - Implements the standard JSON-RPC 2.0 Model Context Protocol, exposing 5 guarded PayPal financial tools (`sentinel_audit_treasury`, `sentinel_guarded_purchase`, `sentinel_remediate_subscription`, `sentinel_auto_switch_arbitrage`, `sentinel_simulate_webhook_trap`) to external AI agents (Claude Desktop, Cursor, OpenAI Agents) under strict zero-trust budget guardrails.
 
 ---
 
@@ -100,31 +107,31 @@ We engineered SentinelPay using a strict **3-tier modular architecture**:
 - **Voix-off (Anglais recommandé pour le jury international) :**
   > *"Every year, companies waste over 135 billion dollars on dormant SaaS subscriptions, unused team seats, and silent price hikes. Meanwhile, AI agents want to buy software autonomously—but no one trusts an unconstrained LLM with their PayPal account. Meet SentinelPay: autonomous PayPal subscription management and policy-guarded Agentic Commerce, powered by Google Gemini and PayPal Sandbox APIs."*
 
-### Séquence 2 — Audit Télémétrique & Downgrade Intelligent `/revise` (0:25 – 1:10)
+### Séquence 2 — Pare-feu Webhook Temps Réel & Remboursement Instantané (0:25 – 0:55)
+- **À l'écran :** Bandeau violet en haut de page **« Pare-feu d'interception Webhooks PayPal en direct »**.
+- **Action souris :**
+  1. Clique sur **« Simuler Arnaque Essai (1 $ -> 49 $) »**.
+  2. Montre l'interception immédiate de l'événement `PAYMENT.SALE.COMPLETED` et le remboursement automatique en direct (`POST /v2/payments/captures/{id}/refund • HTTP 201`).
+  3. Clique sur le bouton inspecteur JSON PayPal pour montrer le reçu cryptographique.
+- **Voix-off :**
+  > *"Watch our Live Webhook Firewall in action. When an unauthorized 1-dollar trial silently attempts to convert into a 49-dollar monthly charge, SentinelPay intercepts the signed PayPal webhook, freezes the billing agreement, and issues an instant clawback refund via PayPal Captures Refund API v2 in under 100 milliseconds."*
+
+### Séquence 3 — Audit Télémétrique, Arbitrage 1-Clic & Négociation B2B (0:55 – 1:40)
 - **À l'écran :** Grand livre des abonnements récurrents PayPal (colonne de gauche).
 - **Action souris :**
-  1. Clique sur la ligne **DesignFlow Enterprise (120,00 $/mois)** pour déplier sa fiche télémétrique (`2 / 10 sièges utilisés`, économie de `1 092,00 $/an`).
-  2. Clique sur le bouton bleu **« Passer au forfait Starter (29,00 $/mois) »**.
-  3. Montre le reçu vert PayPal qui apparaît instantanément (`POST /v1/billing/subscriptions/I-9X821KLLQP9M/revise • HTTP 200`).
-  4. Clique ensuite en haut sur le bouton blanc de la bannière : **« Optimiser les 3 abonnements »** pour nettoyer d'un seul coup les abonnements zombies restants (`/cancel` et `/suspend`).
+  1. Clique sur **CloudGPU Studio Pro ($89/mo)** et clique sur le bouton bleu **« Remplacer par RunPod Serverless GPU (19,00 $/mois) »**. Montre la double transaction atomique (`/cancel` de l'ancien outil + création d'ordre PayPal v2 du nouveau).
+  2. Déplie **DesignFlow Enterprise (120,00 $/mois)** et clique sur **« Négocier remise B2B (-40%) »**.
+  3. Montre la mise en demeure formelle générée par Gemini sur la télémétrie réelle, la contre-offre du fournisseur acceptée à 72 $/mois, et valide en un clic via l'API PayPal `/revise`.
+  4. Clique en haut sur le bouton blanc de la bannière : **« Optimiser les abonnements »** pour le balayage autonome complet.
 - **Voix-off :**
-  > *"SentinelPay correlates PayPal Billing Agreements with real usage telemetry. Look at DesignFlow Enterprise: we are paying 120 dollars a month for 10 seats, but only 2 seats are active. Instead of blindly cancelling a tool the team still uses, SentinelPay calls PayPal's Subscriptions Revise API to downgrade the plan to 29 dollars a month—saving 1,092 dollars a year in one click. And with our Autonomous Sweep, we can cancel dormant zombie SaaS and suspend silent price hikes across the entire portfolio, unlocking 2,682 dollars in verified annual savings."*
+  > *"For active subscriptions, SentinelPay doesn't just cut tools: it offers 1-Click SaaS Arbitrage, automatically cancelling overpriced services and provisioning 60% cheaper alternatives via PayPal Orders v2. It also features an autonomous B2B retention negotiator powered by Gemini, sending telemetry-backed notices that secure 40% enterprise discounts directly revised on PayPal's billing plans."*
 
-### Séquence 3 — Agentic Commerce & Les 3 Niveaux de Guardrails PayPal Orders v2 (1:10 – 2:00)
-- **À l'écran :** Colonne de droite (**Contrôle budgétaire des achats autonomes** & **Achats autonomes PayPal Orders v2**).
+### Séquence 4 — Agentic Commerce, Serveur MCP & Rapport CFO (1:40 – 2:30)
+- **À l'écran :** Colonne de droite (Budget Guardrails & Orders v2) puis bouton **Rapport CFO** dans le header.
 - **Action souris :**
-  1. Clique sur la carte **« 19,50 $ — Auto-validé »** (RunPod GPU Cloud). Montre la jauge budgétaire qui monte et le reçu PayPal Order v2 créé avec le **Lien Checkout Sandbox**.
-  2. Clique sur la carte **« 65,00 $ — Approbation 1 clic »** (Anthropic Enterprise). Montre que l'encart **« En attente d'approbation en 1 clic »** s'ouvre en haut de la colonne de droite.
-  3. Clique sur **« Approuver le paiement PayPal (65,00 $) »** pour valider l'ordre en 1 clic.
-  4. Clique sur la carte **« 450,00 $ — Bloqué »** (AWS Dedicated Node) et montre le blocage immédiat dans le journal d'audit.
+  1. Clique sur la carte **« 19,50 $ — Auto-validé »** (crédits GPU) pour montrer la création d'ordre PayPal v2 sous le seuil.
+  2. Clique sur **« 65,00 $ — Approbation 1 clic »** pour montrer le contrôle Human-in-the-Loop.
+  3. Clique sur le bouton **« Rapport CFO »** dans l'en-tête pour ouvrir le Boardpack certifié. Montre la matrice complète, le score de santé financière (98/100 Grade A+), la chaîne SHA-256 vérifiée et le bouton **« Imprimer / PDF »**.
+  4. Mentionne l'interopérabilité via le serveur Model Context Protocol (`mcp_server.py`).
 - **Voix-off :**
-  > *"Now let's look at outbound Agentic Commerce using PayPal Orders v2. Every AI purchase request must pass through our deterministic Budget Guardrail Engine. First, a 19 dollar 50 GPU credit top-up is under our 25 dollar auto-approval threshold, so SentinelPay executes the PayPal Order automatically. Second, a 65 dollar token pack exceeds the threshold: our guardrail intercepts it and routes it to the 1-Click Human Approval queue. With one click, the user approves it and PayPal generates the live Sandbox order. Third, a 450 dollar server request exceeds our 150 dollar monthly cap and is deterministically blocked."*
-
-### Séquence 4 — Commande Naturelle Gemini, Journal SHA-256 & Clôture (2:00 – 2:30)
-- **À l'écran :** Barre **Instruction directe en langage naturel** en bas à gauche + **Journal d'audit PayPal & SHA-256** à droite + modale **Clés API**.
-- **Action souris :**
-  1. Tape dans la barre : `Achète 15$ de crédits GPU via PayPal` et clique sur **Exécuter**.
-  2. Survole le **Journal d'audit PayPal & SHA-256** à droite pour montrer les empreintes cryptographiques `SHA256: ...`.
-  3. Clique brièvement sur **Clés API** en haut à droite pour montrer l'intégration PayPal Sandbox & Gemini, puis referme.
-- **Voix-off :**
-  > *"Users can also instruct SentinelPay in natural language via Google Gemini, while every AI decision, guardrail check, and PayPal Request ID is recorded in a tamper-evident SHA-256 hash chain. SentinelPay turns PayPal into the trusted operating system for autonomous Agentic Commerce. Thank you!"*
+  > *"For outbound Agentic Commerce, our deterministic Budget Guardrails protect autonomous PayPal Orders v2 purchases with strict spending caps. SentinelPay also exposes a full Model Context Protocol (MCP) server so external agents like Claude or Cursor can trigger guarded PayPal transactions. Finally, the CFO can generate a certified boardpack with cryptographic SHA-256 ledger proof in one click. SentinelPay turns PayPal into the trusted operating system for autonomous Agentic Commerce. Thank you!"*
