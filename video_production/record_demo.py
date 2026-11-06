@@ -72,35 +72,36 @@ KEYNOTE_PRESENTATION_SCRIPT = """
 
     /* Full-Screen Keynote Title Slide (Diapositive Fond Blanc Style Big Tech) */
     #keynote-slide-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 2147483640;
-      background: #FFFFFF;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 60px 80px;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 2147483640 !important;
+      background: #FFFFFF !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      text-align: center !important;
+      padding: 60px 80px !important;
       opacity: 0;
       pointer-events: none;
       transform: scale(0.98);
       filter: blur(8px);
-      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                  filter 0.5s ease;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+      transition: opacity 0.50s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.50s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 0.50s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif !important;
     }
     #keynote-slide-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-      transform: scale(1);
-      filter: blur(0px);
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transform: scale(1) !important;
+      filter: blur(0px) !important;
     }
     #keynote-slide-overlay.exiting {
-      opacity: 0;
-      transform: scale(1.04);
-      filter: blur(6px);
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: scale(1.04) !important;
+      filter: blur(6px) !important;
     }
     .slide-badge {
       display: inline-flex;
@@ -206,17 +207,18 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     cursor.classList.remove('clicking');
   });
 
-  // 3. Full-Screen Keynote Slide Element
+  // 3. Full-Screen Keynote Slide Element (starts active for instant keynote opening)
   const slideOverlay = document.createElement('div');
   slideOverlay.id = 'keynote-slide-overlay';
+  slideOverlay.className = 'active';
   slideOverlay.innerHTML = `
     <div class="slide-badge">
       <span class="slide-dot"></span>
-      <span id="slide-kicker-text">KEYNOTE OVERVIEW</span>
+      <span id="slide-kicker-text">KEYNOTE OVERVIEW • ARCHITECTURE</span>
     </div>
-    <h1 class="slide-title" id="slide-title-text">Autonomous PayPal Treasury</h1>
+    <h1 class="slide-title" id="slide-title-text">Autonomous PayPal Treasury & Agentic Commerce</h1>
     <div class="slide-divider"></div>
-    <p class="slide-subtitle" id="slide-sub-text">Eliminating zombie SaaS waste</p>
+    <p class="slide-subtitle" id="slide-sub-text">Eliminating zombie SaaS waste & policy-guarding autonomous AI spending with PayPal Sandbox APIs</p>
   `;
   document.body.appendChild(slideOverlay);
 
@@ -235,7 +237,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     window._slideExitTimeout = setTimeout(() => {
       slideOverlay.classList.remove('active');
       slideOverlay.classList.add('exiting');
-    }, Math.max(duration - 600, 1000));
+    }, Math.max(duration - 550, 1000));
 
     window._slideDoneTimeout = setTimeout(() => {
       slideOverlay.classList.remove('exiting');
@@ -396,8 +398,13 @@ def record_session():
 
         print("Navigating to SentinelPay Web Interface (http://127.0.0.1:5173)...")
         page.goto("http://127.0.0.1:5173", wait_until="networkidle")
+
+        # Wait until dashboard is fully hydrated and KPI banner is visible
+        page.wait_for_selector("#kpi-banner", state="visible", timeout=15000)
+
+        # Inject presentation engine (Slide 1 is active immediately)
         page.evaluate(KEYNOTE_PRESENTATION_SCRIPT)
-        time.sleep(1.0)
+        time.sleep(0.5)
 
         start_time = time.time()
         print("Recording started at t=0s with Keynote Slide Transitions & Apple Motion Engine...")
@@ -406,7 +413,8 @@ def record_session():
         # SCENE 1: The Hook & Overview (0s to ~33.3s)
         # -------------------------------------------------------------
         print("\n[SCENE 1] Hook & Overview (0s - 33.3s)...")
-        print("  -> Displaying Slide 1: Introduction Title Slide...")
+        print("  -> Displaying Slide 1: Introduction Title Slide (0.0s - 3.2s)...")
+        # Trigger slide 1 dissolve after 3.2s
         page.evaluate("""
             window.showSlide(
                 'KEYNOTE OVERVIEW • ARCHITECTURE',
@@ -467,7 +475,7 @@ def record_session():
         # SCENE 2: Live Webhook Trap & Instant Refund (33.3s to ~71.0s)
         # -------------------------------------------------------------
         print("\n[SCENE 2] Live Webhook Firewall & Instant Refund (33.3s - 71.0s)...")
-        print("  -> Displaying Slide 2: Webhook Firewall Title Slide...")
+        print("  -> Displaying Slide 2: Webhook Firewall Title Slide (33.3s - 36.8s)...")
         page.evaluate("""
             window.showSlide(
                 'PART 01 • REAL-TIME THREAT DEFENSE',
@@ -503,17 +511,18 @@ def record_session():
         time.sleep(3.0)
 
         # Click on Developer X-Ray JSON Inspector button to reveal PayPal raw response
-        inspector_btn = page.locator("button:has-text('Developer X-Ray')")
+        inspector_btn = page.locator("button:has-text('Inspect PayPal JSON')")
         if inspector_btn.count() == 0:
-            inspector_btn = page.locator("button:has-text('Inspect')")
+            inspector_btn = page.locator("button:has-text('Developer X-Ray')")
         if inspector_btn.count() > 0:
             print("  -> Clicking PayPal Developer X-Ray...")
             click_locator_with_ripple(page, inspector_btn.first, delay_after=1.8)
-            time.sleep(3.5)
-            # Close inspector
-            close_btn = page.locator("button:has-text('Close')")
-            if close_btn.count() > 0:
-                click_locator_with_ripple(page, close_btn.first, delay_after=1.0)
+            time.sleep(3.0)
+            # Explicitly close the inspector drawer so it doesn't linger!
+            hide_btn = page.locator("button:has-text('Hide PayPal JSON')")
+            if hide_btn.count() > 0:
+                print("  -> Closing PayPal Developer X-Ray drawer...")
+                click_locator_with_ripple(page, hide_btn.first, delay_after=1.0)
 
         # Reset camera smoothly
         page.evaluate("window.cameraReset(600)")
@@ -528,7 +537,7 @@ def record_session():
         # SCENE 3: SaaS Arbitrage & Gemini B2B Negotiation (71.0s to ~124.6s)
         # -------------------------------------------------------------
         print("\n[SCENE 3] 1-Click SaaS Arbitrage & B2B Negotiation (71.0s - 124.6s)...")
-        print("  -> Displaying Slide 3: SaaS Arbitrage & B2B Negotiation Slide...")
+        print("  -> Displaying Slide 3: SaaS Arbitrage & B2B Negotiation Slide (71.0s - 74.5s)...")
         page.evaluate("""
             window.showSlide(
                 'PART 02 • TREASURY OPTIMIZATION',
@@ -549,7 +558,9 @@ def record_session():
         time.sleep(1.5)
 
         # Find and click on CloudGPU Pro row to expand telemetry
-        gpu_row = page.locator("div:has-text('CloudGPU Pro')").first
+        gpu_row = page.locator("span:has-text('CloudGPU Studio Pro')").first
+        if gpu_row.count() == 0:
+            gpu_row = page.locator("span:has-text('CloudGPU')").first
         if gpu_row.count() > 0:
             print("  -> Expanding CloudGPU Pro telemetry...")
             click_locator_with_ripple(page, gpu_row, delay_after=1.8)
@@ -561,34 +572,45 @@ def record_session():
             print("  -> Triggering 1-Click SaaS Arbitrage (Switch to RunPod)...")
             click_locator_with_ripple(page, switch_btn.first, delay_after=2.0)
 
-        # Find and click DesignFlow Enterprise row
-        design_row = page.locator("div:has-text('DesignFlow Enterprise')").first
-        if design_row.count() > 0:
-            print("  -> Expanding DesignFlow Enterprise telemetry...")
-            click_locator_with_ripple(page, design_row, delay_after=1.5)
+        # Robust expansion of DesignFlow Enterprise row
+        print("  -> Ensuring DesignFlow Enterprise row is expanded...")
+        neg_btn = page.locator("button:has-text('Negotiate B2B Discount')")
+        if neg_btn.count() == 0 or not neg_btn.first.is_visible():
+            design_row = page.locator("span:has-text('DesignFlow Enterprise')").first
+            if design_row.count() > 0:
+                click_locator_with_ripple(page, design_row, delay_after=1.8)
 
         # Click "Negotiate B2B Discount (-40%)"
         neg_btn = page.locator("button:has-text('Negotiate B2B Discount')")
-        if neg_btn.count() > 0:
+        if neg_btn.count() > 0 and neg_btn.first.is_visible():
             print("  -> Launching Gemini Autonomous Retention Negotiator...")
             click_locator_with_ripple(page, neg_btn.first, delay_after=2.5)
 
             # Camera zoom on the B2B modal
             page.evaluate("window.cameraZoomTo('#b2b-modal', 1.15, 600, true)")
-            time.sleep(3.0)
+            time.sleep(2.5)
+
+            # Hover formal notice letter
+            human_move(page, 960, 420)
+            time.sleep(2.5)
+
+            # Hover 40% discount savings
+            human_move(page, 960, 520)
+            time.sleep(2.0)
 
             # Click "Apply 40% Discount on PayPal via /revise"
-            apply_btn = page.locator("button:has-text('Apply 40% Discount')")
-            if apply_btn.count() == 0:
-                apply_btn = page.locator("button:has-text('Appliquer -40%')")
+            apply_btn = page.locator("button:has-text('Apply 40% Discount')").or_(
+                page.locator("button:has-text('Appliquer -40%')")
+            )
             if apply_btn.count() > 0:
                 print("  -> Applying 40% discount on PayPal via /revise...")
-                click_locator_with_ripple(page, apply_btn.first, delay_after=2.0)
+                click_locator_with_ripple(page, apply_btn.first, delay_after=2.2)
 
             # Close negotiation modal
-            close_modal = page.locator("button:has-text('Close')")
+            close_modal = page.locator("#b2b-modal button:has-text('Close')")
             if close_modal.count() > 0:
-                click_locator_with_ripple(page, close_modal.first, delay_after=1.0)
+                print("  -> Closing B2B negotiation modal...")
+                click_locator_with_ripple(page, close_modal.first, delay_after=1.2)
 
         # Reset camera
         page.evaluate("window.cameraReset(600)")
@@ -618,7 +640,7 @@ def record_session():
         # SCENE 4: Agentic Commerce & Certified CFO Boardpack (124.6s to ~173.0s)
         # -------------------------------------------------------------
         print("\n[SCENE 4] Agentic Commerce & CFO Boardpack (124.6s - 173.0s)...")
-        print("  -> Displaying Slide 4: Budget Guardrails Title Slide...")
+        print("  -> Displaying Slide 4: Budget Guardrails Title Slide (124.6s - 128.0s)...")
         page.evaluate("""
             window.showSlide(
                 'PART 03 • AGENTIC COMMERCE & MCP',

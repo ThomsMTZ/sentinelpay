@@ -222,7 +222,7 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [filterTab, setFilterTab] = useState<'all' | 'flagged' | 'resolved'>('all');
-  const [expandedSubId, setExpandedSubId] = useState<string | null>('SUB-DESIGNFLOW-02');
+  const [expandedSubId, setExpandedSubId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Live Webhook Trap Interception state
@@ -595,7 +595,7 @@ export default function App() {
         <div className="bg-white border border-[#E2E8F0] rounded-2xl px-8 py-6 shadow-sm flex items-center gap-4">
           <div className="w-5 h-5 rounded-full border-2 border-[#003087] border-t-transparent animate-spin" />
           <span className="text-[15px] font-medium text-[#0C121D]">
-            Synchronisation des accords de facturation PayPal…
+            Synchronizing PayPal Billing Agreements & Gemini Treasury Engine…
           </span>
         </div>
       </div>
