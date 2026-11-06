@@ -35,15 +35,15 @@ class SubscriptionAuditEngine:
             sub.estimated_annual_savings = round(sub.monthly_cost * 12, 2)
             days_left = t.trial_days_remaining if t.trial_days_remaining is not None else 2
             overlap_note = (
-                f" et doublon 100% avec '{t.overlapping_tool_name}'"
+                f" and 100% functional overlap with '{t.overlapping_tool_name}'"
                 if t.overlapping_tool_name
                 else ""
             )
             sub.ai_audit_rationale = (
-                f"Piège d'essai détecté ({t.raw_paypal_descriptor}) : conversion automatique de "
+                f"Predatory trial trap detected ({t.raw_paypal_descriptor}): automatic conversion from "
                 f"${t.previous_monthly_cost:.2f} -> ${sub.monthly_cost:.2f}/mo (+{t.price_change_pct_last_90d:.0f}%) "
-                f"dans {days_left} jours ({t.active_days_last_30d}j actif/30j{overlap_note}). "
-                f"Résiliation immédiate via PayPal /cancel pour éviter ${sub.estimated_annual_savings:,.2f}/an de perte."
+                f"in {days_left} days ({t.active_days_last_30d} active days/30d{overlap_note}). "
+                f"Immediate termination via PayPal /cancel to protect ${sub.estimated_annual_savings:,.2f}/yr."
             )
             return sub
 
@@ -54,13 +54,13 @@ class SubscriptionAuditEngine:
             sub.recommended_action = ActionType.CANCEL_SUBSCRIPTION
             sub.estimated_annual_savings = round(sub.monthly_cost * 12, 2)
             hike_note = (
-                f" malgré une hausse silencieuse de +{t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.0f} -> ${sub.monthly_cost:.0f}/mo)"
+                f" despite silent price surge of +{t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.0f} -> ${sub.monthly_cost:.0f}/mo)"
                 if t.price_change_pct_last_90d > 0
                 else ""
             )
             sub.ai_audit_rationale = (
-                f"SaaS Zombie ({t.raw_paypal_descriptor}) : 0 session active depuis {t.days_since_last_login} jours"
-                f"{hike_note}. Aucune rétention critique : coupure définitive via PayPal /cancel (${sub.estimated_annual_savings:,.2f}/an économisés)."
+                f"Zombie SaaS ({t.raw_paypal_descriptor}): 0 active sessions for {t.days_since_last_login} days"
+                f"{hike_note}. No critical retention lock: permanent cancellation via PayPal /cancel (${sub.estimated_annual_savings:,.2f}/yr saved)."
             )
             return sub
 
@@ -72,15 +72,15 @@ class SubscriptionAuditEngine:
             sub.recommended_action = ActionType.DOWNGRADE_PLAN
             sub.estimated_annual_savings = round(sub.downgrade_option.annual_savings, 2)
             lock_note = (
-                "Protection des actifs/contrats active (has_data_retention_or_contract_lock) : "
+                "Data retention protection active (has_data_retention_or_contract_lock): "
                 if t.has_data_retention_or_contract_lock
                 else ""
             )
             sub.ai_audit_rationale = (
-                f"Hausse tarifaire de +{t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.0f} -> ${sub.monthly_cost:.0f}/mo) "
-                f"alors que seuls {t.active_seats}/{t.provisioned_seats} sièges sont actifs ({int(seat_utilization*100)}%). "
-                f"{lock_note}Downgrade non-destructif via PayPal /revise vers '{sub.downgrade_option.target_plan_name}' "
-                f"(${sub.downgrade_option.new_monthly_cost:.0f}/mo) au lieu de /cancel pour économiser ${sub.downgrade_option.annual_savings:,.2f}/an."
+                f"Price creep of +{t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.0f} -> ${sub.monthly_cost:.0f}/mo) "
+                f"while only {t.active_seats}/{t.provisioned_seats} provisioned seats are active ({int(seat_utilization*100)}%). "
+                f"{lock_note}Non-destructive downgrade via PayPal /revise to '{sub.downgrade_option.target_plan_name}' "
+                f"(${sub.downgrade_option.new_monthly_cost:.0f}/mo) instead of cancelling, preserving workflow and saving ${sub.downgrade_option.annual_savings:,.2f}/yr."
             )
             return sub
 
@@ -91,8 +91,8 @@ class SubscriptionAuditEngine:
             sub.recommended_action = ActionType.CANCEL_SUBSCRIPTION
             sub.estimated_annual_savings = round(sub.monthly_cost * 12, 2)
             sub.ai_audit_rationale = (
-                f"Doublon fonctionnel à 100% avec '{t.overlapping_tool_name}' ({t.active_days_last_30d}j actif/30j). "
-                f"Résiliation PayPal /cancel recommandée (${sub.estimated_annual_savings:,.2f}/an)."
+                f"100% functional overlap with '{t.overlapping_tool_name}' ({t.active_days_last_30d} active days/30d). "
+                f"PayPal /cancel recommended (${sub.estimated_annual_savings:,.2f}/yr saved)."
             )
             return sub
 
@@ -103,9 +103,9 @@ class SubscriptionAuditEngine:
             sub.recommended_action = ActionType.SUSPEND_SUBSCRIPTION
             sub.estimated_annual_savings = round(sub.monthly_cost * 12, 2)
             sub.ai_audit_rationale = (
-                f"Dérive tarifaire furtive de +{t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.2f} -> ${sub.monthly_cost:.2f}/mo) "
-                f"sur le descripteur PayPal '{t.raw_paypal_descriptor}' avec 0 événement en {t.days_since_last_login}j. "
-                f"Verrou de rétention des logs actif : mise en pause réversible via PayPal /suspend au lieu de /cancel."
+                f"Silent price creep of +{t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.2f} -> ${sub.monthly_cost:.2f}/mo) "
+                f"on PayPal descriptor '{t.raw_paypal_descriptor}' with 0 feature events in {t.days_since_last_login}d. "
+                f"Telemetry lock active: reversible pause via PayPal /suspend instead of cancellation."
             )
             return sub
 
@@ -115,14 +115,14 @@ class SubscriptionAuditEngine:
         sub.recommended_action = ActionType.KEEP_ACTIVE
         sub.estimated_annual_savings = 0.0
         price_note = (
-            f", tarif négocié en baisse de {t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.0f} -> ${sub.monthly_cost:.0f}/mo)"
+            f", negotiated fee reduced by {t.price_change_pct_last_90d:.1f}% (${t.previous_monthly_cost:.0f} -> ${sub.monthly_cost:.0f}/mo)"
             if t.price_change_pct_last_90d < 0
-            else f", tarif stable (${sub.monthly_cost:.0f}/mo)"
+            else f", price stable (${sub.monthly_cost:.0f}/mo)"
         )
         sub.ai_audit_rationale = (
-            f"ROI élevé ({t.raw_paypal_descriptor}) : {t.active_days_last_30d}/30 jours actifs "
-            f"({t.monthly_api_or_feature_events} événements/mois, ${sub.cost_per_active_day:.2f}/jour actif{price_note}). "
-            f"Maintien de l'accord PayPal."
+            f"High ROI ({t.raw_paypal_descriptor}): {t.active_days_last_30d}/30 active days "
+            f"({t.monthly_api_or_feature_events} feature events/mo, ${sub.cost_per_active_day:.2f}/active day{price_note}). "
+            f"Retaining active PayPal billing mandate."
         )
         return sub
 

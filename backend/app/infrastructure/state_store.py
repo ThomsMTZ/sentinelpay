@@ -48,7 +48,7 @@ def build_initial_subscriptions() -> list[SubscriptionDTO]:
                 alternative_plan="Pay-As-You-Go Spot A100",
                 new_monthly_cost=19.00,
                 annual_net_savings=840.00,
-                migration_rationale="Remplace le workspace A100 dédié inactif à 89 $/mois par du GPU Serverless à la demande (19 $/mois), économisant 840 $/an sans perdre la capacité IA.",
+                migration_rationale="Replaces inactive $89/mo dedicated A100 workspace with on-demand Serverless GPU ($19/mo), saving $840/year with zero downtime.",
             ),
         ),
         SubscriptionDTO(
@@ -119,7 +119,7 @@ def build_initial_subscriptions() -> list[SubscriptionDTO]:
                 alternative_plan="Transcription API Pack",
                 new_monthly_cost=6.00,
                 annual_net_savings=276.00,
-                migration_rationale="Remplace l'abonnement MeetScribe (29 $/mois) par un pack API de transcription à 6 $/mois (79 % moins cher).",
+                migration_rationale="Replaces MeetScribe subscription ($29/mo) with transcription API pack at $6/mo (79% cheaper).",
             ),
         ),
         SubscriptionDTO(

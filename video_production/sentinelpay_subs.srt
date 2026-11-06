@@ -1,0 +1,87 @@
+1
+00:00:00,000 --> 00:00:06,200
+Every year, companies and individuals waste over $135 billion on zombie SaaS subscriptions,
+
+2
+00:00:06,200 --> 00:00:10,800
+underutilized team seats, and silent recurring price hikes.
+
+3
+00:00:10,800 --> 00:00:17,500
+Meanwhile, autonomous AI agents are ready to buy compute—but no CFO will hand an unconstrained LLM raw access to a PayPal account.
+
+4
+00:00:17,500 --> 00:00:23,800
+Welcome to SentinelPay: the autonomous PayPal Treasury and Agentic Commerce copilot,
+
+5
+00:00:23,800 --> 00:00:32,300
+powered by Google Gemini and native PayPal Sandbox REST APIs.
+
+6
+00:00:33,300 --> 00:00:38,500
+Let's start with our real-time defense: the Live Webhook Firewall.
+
+7
+00:00:38,500 --> 00:00:46,000
+Watch what happens when a predatory merchant attempts an unauthorized $1 trial conversion into a recurring $49 charge.
+
+8
+00:00:46,000 --> 00:00:53,200
+The moment the signed PayPal webhook hits our system, SentinelPay verifies the signature and suspends the billing agreement.
+
+9
+00:00:53,200 --> 00:01:02,000
+It triggers an instant clawback refund via PayPal's Captures Refund API v2 in under 100 milliseconds.
+
+10
+00:01:02,000 --> 00:01:10,020
+With our PayPal Developer X-Ray, inspect the raw JSON receipt, HATEOAS links, and verified idempotency keys.
+
+11
+00:01:11,020 --> 00:01:17,200
+Next, SentinelPay continuously audits active subscriptions against real usage telemetry.
+
+12
+00:01:17,200 --> 00:01:23,500
+Instead of just cutting tools, SentinelPay offers 1-Click SaaS Arbitrage.
+
+13
+00:01:23,500 --> 00:01:31,800
+It cancels overpriced CloudGPU Pro at $89/mo and provisions an equivalent RunPod serverless cluster for $19 via PayPal Orders v2—saving $840/year.
+
+14
+00:01:31,800 --> 00:01:39,000
+For active tools like DesignFlow Enterprise, our Gemini Copilot initiates an active B2B retention negotiation.
+
+15
+00:01:39,000 --> 00:01:46,500
+It drafts a formal notice citing actual usage, secures a 40% enterprise discount, and applies it directly via the Subscriptions Revise API.
+
+16
+00:01:46,500 --> 00:01:54,500
+With our Autonomous Sweep, one click cleans up dormant zombies and flips our Financial Health Score from 38 to 98.
+
+17
+00:01:55,500 --> 00:02:02,800
+For outbound Agentic Commerce, our deterministic Budget Guardrails protect autonomous spending.
+
+18
+00:02:02,800 --> 00:02:11,200
+A $19.50 GPU credit top-up is auto-approved under our $25 threshold and captured via PayPal Orders v2.
+
+19
+00:02:11,200 --> 00:02:18,500
+A $65 token pack requires human approval and is queued for a safe 1-click confirmation.
+
+20
+00:02:18,500 --> 00:02:26,000
+SentinelPay also exposes a full Model Context Protocol server, enabling external AI agents in Claude or Cursor to command PayPal safely.
+
+21
+00:02:26,000 --> 00:02:34,000
+Finally, the CFO can generate a certified, board-ready audit pack complete with before-and-after spend benchmarks and SHA-256 proof.
+
+22
+00:02:34,000 --> 00:02:42,500
+SentinelPay turns PayPal into the trusted operating system for autonomous commerce.

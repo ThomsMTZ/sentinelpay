@@ -67,7 +67,7 @@ Hackathon/
 ## Quick Start (1 Minute)
 
 ### 1. Configure Credentials (Optional at boot — Hot-Reload Supported)
-Copy `.env.example` to `.env` and paste your PayPal Developer Sandbox & Gemini keys (or enter them live in the UI via the **Clés API** button):
+Copy `.env.example` to `.env` and paste your PayPal Developer Sandbox & Gemini keys (or enter them live in the UI via the **API Keys** button):
 
 ```env
 PAYPAL_CLIENT_ID=your_sandbox_client_id

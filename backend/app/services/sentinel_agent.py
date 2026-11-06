@@ -396,7 +396,7 @@ class SentinelAgentOrchestrator:
 
             old_cost = sub.monthly_cost
             sub.status = SubscriptionStatus.DOWNGRADED
-            sub.vendor_name = f"{alt.alternative_vendor} (remplace {original_vendor})"
+            sub.vendor_name = f"{alt.alternative_vendor} (replaces {original_vendor})"
             sub.plan_name = alt.alternative_plan
             sub.monthly_cost = alt.new_monthly_cost
             sub.telemetry.previous_monthly_cost = old_cost

@@ -5,149 +5,290 @@ import glob
 import math
 import random
 import subprocess
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 import imageio_ffmpeg
 from playwright.sync_api import sync_playwright
 
 FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
 
-# Big Tech presentation overlay & water-ripple cursor script
-BIG_TECH_OVERLAY_SCRIPT = """
+# =============================================================================
+# Big Tech & Apple-Grade Presentation Injections (Cursor, Zoom, Chapters)
+# =============================================================================
+APPLE_PRESENTATION_SCRIPT = """
 (() => {
-    if (document.getElementById('big-tech-cursor')) return;
+  if (document.getElementById('apple-motion-cursor')) return;
 
-    // 1. macOS High-DPI Cursor Arrow
-    const cursor = document.createElement('div');
-    cursor.id = 'big-tech-cursor';
-    cursor.innerHTML = `
-        <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.38));">
-            <path d="M3 2L24.5 17L14 18.5L19 30.5L14.5 32.5L9.5 20.5L3 26V2Z" fill="#0C121D" stroke="#FFFFFF" stroke-width="2.2" stroke-linejoin="round"/>
-        </svg>
-    `;
-    cursor.style.position = 'fixed';
-    cursor.style.pointerEvents = 'none';
-    cursor.style.zIndex = '9999999';
-    cursor.style.left = '960px';
-    cursor.style.top = '540px';
-    cursor.style.transformOrigin = '3px 2px';
-    cursor.style.transform = 'scale(1)';
-    cursor.style.transition = 'transform 0.1s cubic-bezier(0.2, 0.9, 0.3, 1)';
-    document.body.appendChild(cursor);
+  // 1. Inject Styles for Apple Cursor, Ripple Physics & Chapter Cards
+  const style = document.createElement('style');
+  style.id = 'apple-motion-styles';
+  style.textContent = `
+    #apple-motion-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 26px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 2147483647;
+      transform-origin: 3px 2px;
+      transform: translate3d(-100px, -100px, 0) scale(1);
+      transition: transform 0.09s cubic-bezier(0.2, 0.9, 0.3, 1);
+      will-change: transform;
+    }
+    #apple-motion-cursor.clicking {
+      transform: translate3d(var(--cursor-x), var(--cursor-y), 0) scale(0.86) !important;
+    }
+    .apple-click-ripple {
+      position: fixed;
+      pointer-events: none;
+      z-index: 2147483646;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      opacity: 1;
+      will-change: transform, opacity;
+    }
+    .apple-ripple-core {
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #009CDE 0%, rgba(0, 112, 186, 0.4) 100%);
+      box-shadow: 0 0 14px rgba(0, 156, 222, 0.9);
+      transition: transform 0.38s ease-out, opacity 0.38s ease-out;
+    }
+    .apple-ripple-wave {
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(0, 112, 186, 0.9);
+      background: rgba(0, 156, 222, 0.15);
+      box-shadow: 0 0 22px rgba(0, 112, 186, 0.5);
+      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease-out, border-width 0.65s ease;
+    }
 
-    // 2. Ripple Container
-    const rippleContainer = document.createElement('div');
-    rippleContainer.id = 'big-tech-ripples';
-    rippleContainer.style.position = 'fixed';
-    rippleContainer.style.pointerEvents = 'none';
-    rippleContainer.style.zIndex = '9999998';
-    rippleContainer.style.inset = '0';
-    document.body.appendChild(rippleContainer);
+    /* Chapter Card (Dynamic Island Keynote Architecture) */
+    #apple-chapter-container {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-40px) scale(0.95);
+      opacity: 0;
+      filter: blur(8px);
+      z-index: 2147483640;
+      pointer-events: none;
+      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 0.5s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+    }
+    #apple-chapter-container.active {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
+      filter: blur(0px);
+    }
+    .chapter-card-pill {
+      position: relative;
+      background: rgba(12, 18, 29, 0.90);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-top: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 9999px;
+      padding: 10px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 24px rgba(0, 112, 186, 0.32);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      overflow: hidden;
+    }
+    .chapter-badge {
+      background: linear-gradient(135deg, rgba(0, 112, 186, 0.45), rgba(0, 156, 222, 0.25));
+      border: 1px solid rgba(0, 156, 222, 0.55);
+      color: #38BDF8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+    .chapter-kicker {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1;
+    }
+    .chapter-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      line-height: 1.2;
+    }
+    .chapter-progress-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2.5px;
+      background: linear-gradient(90deg, #0070BA, #009CDE, #38BDF8);
+      width: 0%;
+      border-radius: 9999px;
+      transition: width linear;
+    }
+  `;
+  document.head.appendChild(style);
 
-    // 3. Big Tech Product Feature Pill (Apple / Microsoft / Anthropic Keynote Style)
-    const pill = document.createElement('div');
-    pill.id = 'big-tech-feature-pill';
-    pill.style.position = 'fixed';
-    pill.style.bottom = '36px';
-    pill.style.left = '50%';
-    pill.style.transform = 'translateX(-50%) translateY(120px)';
-    pill.style.opacity = '0';
-    pill.style.pointerEvents = 'none';
-    pill.style.zIndex = '9999990';
-    pill.style.background = 'rgba(12, 18, 29, 0.88)';
-    pill.style.backdropFilter = 'blur(20px)';
-    pill.style.webkitBackdropFilter = 'blur(20px)';
-    pill.style.border = '1px solid rgba(255, 255, 255, 0.18)';
-    pill.style.borderRadius = '9999px';
-    pill.style.padding = '12px 28px';
-    pill.style.boxShadow = '0 20px 50px rgba(0, 48, 135, 0.3), 0 6px 20px rgba(0, 0, 0, 0.45)';
-    pill.style.display = 'flex';
-    pill.style.alignItems = 'center';
-    pill.style.gap = '14px';
-    pill.style.color = '#FFFFFF';
-    pill.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    pill.style.fontSize = '14px';
-    pill.style.fontWeight = '500';
-    pill.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease';
-    pill.innerHTML = `
-        <span id="pill-icon" style="font-size:20px; line-height:1;">✨</span>
-        <span id="pill-title" style="font-weight:700; color:#0070BA; letter-spacing:-0.2px;">SentinelPay</span>
-        <span style="color:rgba(255,255,255,0.3); font-weight:300;">•</span>
-        <span id="pill-desc" style="color:#F1F5F9; font-weight:500;">Autonomous Treasury Copilot</span>
-    `;
-    document.body.appendChild(pill);
+  // 2. Vector SVG Pointer (Apple macOS Aerodynamic Design)
+  const cursor = document.createElement('div');
+  cursor.id = 'apple-motion-cursor';
+  cursor.innerHTML = `
+    <svg width="26" height="32" viewBox="0 0 26 32" fill="none" xmlns="http://www.w3.org/2000/svg"
+         style="filter: drop-shadow(0 2px 5px rgba(0,0,0,0.32)) drop-shadow(0 6px 14px rgba(0,0,0,0.18));">
+      <path d="M2.5 1.8L22.2 16.5L12.8 17.8L17.2 28.5L13.1 30.2L8.7 19.5L2.5 24.6V1.8Z"
+            fill="#0C121D" stroke="#FFFFFF" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+  `;
+  document.body.appendChild(cursor);
 
-    // Water Ripple Shockwave on Click (Goutte d'eau)
-    window.addEventListener('mousedown', (e) => {
-        cursor.style.transform = 'scale(0.85)';
+  // Track Mouse Movement
+  let currentX = 960, currentY = 540;
+  window.addEventListener('mousemove', (e) => {
+    currentX = e.clientX;
+    currentY = e.clientY;
+    cursor.style.setProperty('--cursor-x', `${currentX}px`);
+    cursor.style.setProperty('--cursor-y', `${currentY}px`);
+    cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+  }, { passive: true });
 
-        // Inner drop ripple
-        const innerDrop = document.createElement('div');
-        innerDrop.style.position = 'fixed';
-        innerDrop.style.left = e.clientX + 'px';
-        innerDrop.style.top = e.clientY + 'px';
-        innerDrop.style.width = '8px';
-        innerDrop.style.height = '8px';
-        innerDrop.style.borderRadius = '50%';
-        innerDrop.style.transform = 'translate(-50%, -50%) scale(1)';
-        innerDrop.style.backgroundColor = 'rgba(0, 112, 186, 0.7)';
-        innerDrop.style.boxShadow = '0 0 16px rgba(0, 112, 186, 0.9)';
-        innerDrop.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-        rippleContainer.appendChild(innerDrop);
+  // Spring Press Dynamics & Dual-Ring Shockwave
+  window.addEventListener('mousedown', (e) => {
+    cursor.classList.add('clicking');
 
-        // Outer water ring shockwave
-        const outerRing = document.createElement('div');
-        outerRing.style.position = 'fixed';
-        outerRing.style.left = e.clientX + 'px';
-        outerRing.style.top = e.clientY + 'px';
-        outerRing.style.width = '14px';
-        outerRing.style.height = '14px';
-        outerRing.style.borderRadius = '50%';
-        outerRing.style.transform = 'translate(-50%, -50%) scale(1)';
-        outerRing.style.border = '2.5px solid rgba(0, 112, 186, 0.9)';
-        outerRing.style.backgroundColor = 'rgba(0, 112, 186, 0.15)';
-        outerRing.style.boxShadow = '0 0 24px rgba(0, 112, 186, 0.7)';
-        outerRing.style.transition = 'transform 0.7s cubic-bezier(0.1, 0.8, 0.25, 1), opacity 0.7s ease-out';
-        rippleContainer.appendChild(outerRing);
+    // Inner Core Pulse
+    const core = document.createElement('div');
+    core.className = 'apple-click-ripple apple-ripple-core';
+    core.style.left = `${e.clientX}px`;
+    core.style.top = `${e.clientY}px`;
+    document.body.appendChild(core);
 
-        requestAnimationFrame(() => {
-            innerDrop.style.transform = 'translate(-50%, -50%) scale(4)';
-            innerDrop.style.opacity = '0';
+    // Outer Expansion Ring
+    const wave = document.createElement('div');
+    wave.className = 'apple-click-ripple apple-ripple-wave';
+    wave.style.left = `${e.clientX}px`;
+    wave.style.top = `${e.clientY}px`;
+    document.body.appendChild(wave);
 
-            outerRing.style.transform = 'translate(-50%, -50%) scale(9.5)';
-            outerRing.style.opacity = '0';
-            outerRing.style.borderWidth = '1px';
-        });
-
-        setTimeout(() => {
-            innerDrop.remove();
-            outerRing.remove();
-        }, 750);
+    requestAnimationFrame(() => {
+      core.style.transform = 'translate(-50%, -50%) scale(3.2)';
+      core.style.opacity = '0';
+      wave.style.transform = 'translate(-50%, -50%) scale(4.8)';
+      wave.style.opacity = '0';
+      wave.style.borderWidth = '1px';
     });
 
-    window.addEventListener('mouseup', () => {
-        cursor.style.transform = 'scale(1)';
+    setTimeout(() => { core.remove(); wave.remove(); }, 700);
+  });
+
+  window.addEventListener('mouseup', () => {
+    cursor.classList.remove('clicking');
+  });
+
+  // 3. Chapter Card Container Element
+  const chapterContainer = document.createElement('div');
+  chapterContainer.id = 'apple-chapter-container';
+  chapterContainer.innerHTML = `
+    <div class="chapter-card-pill">
+      <span class="chapter-badge" id="chap-num">01</span>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span class="chapter-kicker" id="chap-kicker">THREAT MITIGATION</span>
+        <span class="chapter-title" id="chap-title">Real-Time Webhook Firewall</span>
+      </div>
+      <div class="chapter-progress-line" id="chap-progress"></div>
+    </div>
+  `;
+  document.body.appendChild(chapterContainer);
+
+  window.showChapter = (num, kicker, title, duration = 6500) => {
+    document.getElementById('chap-num').textContent = num;
+    document.getElementById('chap-kicker').textContent = kicker;
+    document.getElementById('chap-title').textContent = title;
+
+    const prog = document.getElementById('chap-progress');
+    prog.style.transition = 'none';
+    prog.style.width = '0%';
+
+    chapterContainer.classList.add('active');
+
+    requestAnimationFrame(() => {
+      prog.style.transition = `width ${duration}ms linear`;
+      prog.style.width = '100%';
     });
 
-    window.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-    });
+    if (window._chapTimeout) clearTimeout(window._chapTimeout);
+    window._chapTimeout = setTimeout(() => {
+      chapterContainer.classList.remove('active');
+    }, duration);
+  };
 
-    window.showFeaturePill = (icon, title, desc, duration = 6500) => {
-        const p = document.getElementById('big-tech-feature-pill');
-        if (!p) return;
-        document.getElementById('pill-icon').textContent = icon;
-        document.getElementById('pill-title').textContent = title;
-        document.getElementById('pill-desc').textContent = desc;
-        p.style.transform = 'translateX(-50%) translateY(0)';
-        p.style.opacity = '1';
-        if (window._pillTimeout) clearTimeout(window._pillTimeout);
-        if (duration > 0) {
-            window._pillTimeout = setTimeout(() => {
-                p.style.transform = 'translateX(-50%) translateY(120px)';
-                p.style.opacity = '0';
-            }, duration);
-        }
-    };
+  // 4. Dynamic Camera Zoom & Spotlight System
+  const stage = document.getElementById('root') || document.body;
+  stage.style.transformOrigin = '0 0';
+  stage.style.willChange = 'transform';
+  stage.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+
+  let scrim = document.getElementById('camera-spotlight-scrim');
+  if (!scrim) {
+    scrim = document.createElement('div');
+    scrim.id = 'camera-spotlight-scrim';
+    scrim.style.position = 'fixed';
+    scrim.style.inset = '0';
+    scrim.style.pointerEvents = 'none';
+    scrim.style.zIndex = '999990';
+    scrim.style.opacity = '0';
+    scrim.style.transition = 'opacity 0.6s ease';
+    document.body.appendChild(scrim);
+  }
+
+  window.cameraZoomTo = (target, scale = 1.25, duration = 800, spotlight = true) => {
+    const el = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!el) {
+      console.warn('cameraZoomTo: Target not found', target);
+      return;
+    }
+
+    const prevTransform = stage.style.transform;
+    stage.style.transform = 'none';
+    const rect = el.getBoundingClientRect();
+    stage.style.transform = prevTransform;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const elCenterX = rect.left + rect.width / 2;
+    const elCenterY = rect.top + rect.height / 2;
+
+    const translateX = (vw / 2) - (elCenterX * scale);
+    const translateY = (vh / 2) - (elCenterY * scale);
+
+    stage.style.transition = `transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+    stage.style.transform = `translate3d(${translateX.toFixed(2)}px, ${translateY.toFixed(2)}px, 0) scale(${scale})`;
+
+    if (spotlight) {
+      scrim.style.background = 'radial-gradient(circle at 50% 50%, rgba(12, 18, 29, 0.12) 40%, rgba(12, 18, 29, 0.65) 90%)';
+      scrim.style.opacity = '1';
+    }
+  };
+
+  window.cameraReset = (duration = 650) => {
+    stage.style.transition = `transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+    stage.style.transform = 'translate3d(0, 0, 0) scale(1)';
+    scrim.style.opacity = '0';
+  };
 })();
 """
 
@@ -158,38 +299,46 @@ def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
     Uses quadratic bezier curve with subtle perpendicular deflection.
     """
     current = getattr(page, "_last_mouse_pos", (960, 540))
-    start_x, start_y = current
+    x0, y0 = current
+    x2, y2 = target_x, target_y
 
-    dx = target_x - start_x
-    dy = target_y - start_y
+    dx = x2 - x0
+    dy = y2 - y0
     dist = math.hypot(dx, dy)
 
     if dist < 5:
-        page.mouse.move(target_x, target_y)
-        page._last_mouse_pos = (target_x, target_y)
+        page.mouse.move(x2, y2)
+        page._last_mouse_pos = (x2, y2)
         return
 
-    curvature = min(40, dist * 0.15) * (1 if random.random() > 0.5 else -1)
-    ctrl_x = (start_x + target_x) / 2 - (dy / dist) * curvature
-    ctrl_y = (start_y + target_y) / 2 + (dx / dist) * curvature
+    # Perpendicular control point deflection for natural biological trajectory
+    perp_scale = min(40, dist * 0.18) * (1 if random.random() > 0.5 else -1)
+    norm = max(dist, 1)
+    x1 = (x0 + x2) / 2 - (dy / norm) * perp_scale
+    y1 = (y0 + y2) / 2 + (dx / norm) * perp_scale
 
-    for i in range(1, steps + 1):
-        t = i / steps
-        ease = t * t * (3.0 - 2.0 * t)
-        inv = 1.0 - ease
-        cx = inv * inv * start_x + 2 * inv * ease * ctrl_x + ease * ease * target_x
-        cy = inv * inv * start_y + 2 * inv * ease * ctrl_y + ease * ease * target_y
+    actual_steps = max(12, int(steps * (dist / 400)))
+    actual_steps = min(actual_steps, 36)
 
-        page.mouse.move(cx, cy)
-        sleep_time = base_delay * (1.0 + (ease * 0.8))
-        time.sleep(sleep_time)
+    for i in range(1, actual_steps + 1):
+        t = i / actual_steps
+        # Smooth ease-out deceleration curve
+        t_curved = math.sin(t * math.pi / 2)
 
-    page.mouse.move(target_x, target_y)
-    page._last_mouse_pos = (target_x, target_y)
+        xt = (1 - t_curved) ** 2 * x0 + 2 * (1 - t_curved) * t_curved * x1 + t_curved ** 2 * x2
+        yt = (1 - t_curved) ** 2 * y0 + 2 * (1 - t_curved) * t_curved * y1 + t_curved ** 2 * y2
+
+        page.mouse.move(xt, yt)
+        time.sleep(base_delay + (0.004 * (t ** 2)))
+
+    page.mouse.move(x2, y2)
+    page._last_mouse_pos = (x2, y2)
 
 
-def click_locator_with_ripple(page, locator, delay_after=0.6):
-    """Moves smoothly to the locator and clicks with water ripple shockwave."""
+def click_locator_with_ripple(page, locator, delay_after=1.2):
+    """
+    Moves smoothly to element bounding box, triggers press with spring ripple, then releases.
+    """
     box = locator.bounding_box()
     if box:
         target_x = box["x"] + box["width"] / 2
@@ -240,210 +389,276 @@ def record_session():
         except Exception:
             pass
 
-        print("Navigating to SentinelPay Web Interface...")
+        print("Navigating to SentinelPay Web Interface (http://127.0.0.1:5173)...")
         page.goto("http://127.0.0.1:5173", wait_until="networkidle")
-        page.evaluate(BIG_TECH_OVERLAY_SCRIPT)
+        page.evaluate(APPLE_PRESENTATION_SCRIPT)
         time.sleep(1.2)
 
         start_time = time.time()
-        print("Recording started at t=0s with Big Tech presentation styling...")
+        print("Recording started at t=0s with Apple-grade keynote motion engine...")
 
         # -------------------------------------------------------------
-        # SCENE 1: The Hook & Overview (0s to ~33s)
+        # SCENE 1: The Hook & Overview (0s to ~33.3s)
         # -------------------------------------------------------------
-        print("Scene 1: Hook & Overview...")
-        page.evaluate("window.showFeaturePill('🔷', 'SentinelPay AI', 'Autonomous PayPal Treasury & Agentic Commerce', 8000)")
+        print("\n[SCENE 1] Hook & Overview (0s - 33.3s)...")
+        page.evaluate("window.showChapter('01', 'AUTONOMOUS TREASURY', 'Autonomous PayPal Treasury Copilot', 7500)")
 
-        # Hover brand title
+        # Hover brand title & PayPal badge
         human_move(page, 220, 32)
         time.sleep(3.0)
 
         # Hover connection status pill
         human_move(page, 950, 32)
-        time.sleep(3.0)
+        time.sleep(2.5)
 
-        # Move to potential savings banner ($2,682/yr)
+        # Dynamic zoom on KPI financial synthesis banner
+        print("  -> Dynamic zoom onto #kpi-banner (scale: 1.15)...")
+        page.evaluate("window.cameraZoomTo('#kpi-banner', 1.15, 800, false)")
+        time.sleep(1.0)
+
+        # Hover potential annual savings ($2,682/yr)
         human_move(page, 450, 185)
-        time.sleep(4.0)
-
-        # Move to monthly spend KPI ($301.50)
-        human_move(page, 750, 185)
         time.sleep(3.5)
 
-        # Move to Financial Health Score (38/100 Warning)
-        human_move(page, 1050, 185)
-        time.sleep(4.0)
+        # Hover monthly commitments KPI
+        human_move(page, 750, 185)
+        time.sleep(3.0)
 
-        # Scroll down smoothly to showcase the 6 subscriptions
+        # Hover Health Score bar (38/100)
+        human_move(page, 1050, 185)
+        time.sleep(3.5)
+
+        # Reset camera before overview scroll
+        page.evaluate("window.cameraReset(650)")
+        time.sleep(0.8)
+
+        # Smooth scroll down to showcase the 6 subscriptions
         page.mouse.wheel(0, 160)
-        time.sleep(2.0)
+        time.sleep(1.5)
         human_move(page, 400, 380)
-        time.sleep(3.0)
+        time.sleep(2.5)
         human_move(page, 400, 480)
-        time.sleep(3.0)
+        time.sleep(2.5)
 
         # Scroll back up to top banner for scene 2
         page.mouse.wheel(0, -200)
         time.sleep(1.5)
 
-        # Synchronize with audio
+        # Synchronize with Scene 1 audio boundary (33.3s)
         elapsed = time.time() - start_time
-        if elapsed < 33.0:
-            time.sleep(33.0 - elapsed)
+        if elapsed < 33.3:
+            time.sleep(33.3 - elapsed)
 
         # -------------------------------------------------------------
-        # SCENE 2: Live Webhook Trap & Instant Refund (33s to ~70.5s)
+        # SCENE 2: Live Webhook Trap & Instant Refund (33.3s to ~71.0s)
         # -------------------------------------------------------------
-        print("Scene 2: Webhook Firewall & Instant Refund...")
-        page.evaluate("window.showFeaturePill('⚡', 'Live Webhook Firewall', 'PayPal Captures Refund API v2 Instant Clawback', 8500)")
+        print("\n[SCENE 2] Live Webhook Firewall & Instant Refund (33.3s - 71.0s)...")
+        page.evaluate("window.showChapter('02', 'REAL-TIME THREAT DEFENSE', 'Live Webhook Firewall & Instant Refund', 8000)")
 
-        # Highlight purple Webhook Interceptor banner
-        human_move(page, 620, 105)
-        time.sleep(3.5)
+        # Zoom into the Webhook Firewall section
+        print("  -> Dynamic zoom onto #webhook-firewall (scale: 1.25)...")
+        page.evaluate("window.cameraZoomTo('#webhook-firewall', 1.25, 750, true)")
+        time.sleep(2.5)
 
-        # Click button "Simuler Arnaque Essai (1 $ -> 49 $)" with water ripple
-        trap_button = page.locator("button:has-text('Simuler Arnaque Essai')")
+        # Hover firewall title
+        human_move(page, 580, 220)
+        time.sleep(2.0)
+
+        # Click button "Simulate Trial Trap $1 -> $49" with water-ripple pulse
+        trap_button = page.locator("button:has-text('Simulate Trial Trap')")
         if trap_button.count() > 0:
+            print("  -> Clicking 'Simulate Trial Trap'...")
             click_locator_with_ripple(page, trap_button.first, delay_after=1.8)
-
-        # Highlight the instant refund receipt ($49.00 refunded)
-        time.sleep(2.5)
-        human_move(page, 660, 185)
-        time.sleep(3.5)
-
-        # Click on JSON Inspector button to reveal PayPal raw response
-        inspector_btn = page.locator("button:has-text('Inspecter Payload PayPal')")
-        if inspector_btn.count() > 0:
-            click_locator_with_ripple(page, inspector_btn.first, delay_after=2.2)
-            time.sleep(4.0)
-            # Close inspector
-            close_btn = page.locator("button:has-text('Fermer')")
-            if close_btn.count() > 0:
-                click_locator_with_ripple(page, close_btn.first, delay_after=1.2)
-
-        # Synchronize with audio
-        elapsed = time.time() - start_time
-        if elapsed < 70.5:
-            time.sleep(70.5 - elapsed)
-
-        # -------------------------------------------------------------
-        # SCENE 3: SaaS Arbitrage & B2B Negotiation (70.5s to ~124s)
-        # -------------------------------------------------------------
-        print("Scene 3: SaaS Arbitrage & B2B Negotiation...")
-        page.evaluate("window.showFeaturePill('🔄', '1-Click SaaS Arbitrage', 'Atomic Switch & PayPal /revise Plan Downgrade', 9000)")
-
-        # Scroll to subscriptions list
-        page.mouse.wheel(0, 240)
-        time.sleep(2.0)
-
-        # 1. Expand CloudGPU Studio Pro ($89.00/mo)
-        cloudgpu_row = page.locator("div:has-text('CloudGPU Studio Pro')").first
-        click_locator_with_ripple(page, cloudgpu_row, delay_after=1.8)
-
-        # Highlight 1-Click Arbitrage box
-        human_move(page, 450, 480)
-        time.sleep(3.0)
-
-        # Click "Remplacer par RunPod Serverless GPU"
-        switch_btn = page.locator("button:has-text('Remplacer par RunPod')")
-        if switch_btn.count() > 0:
-            click_locator_with_ripple(page, switch_btn.first, delay_after=2.5)
-
-        # 2. Expand DesignFlow Enterprise ($120.00/mo)
-        designflow_row = page.locator("div:has-text('DesignFlow Enterprise')").first
-        click_locator_with_ripple(page, designflow_row, delay_after=1.8)
-
-        # Click "Négocier remise B2B (-40%)"
-        negotiate_btn = page.locator("button:has-text('Négocier remise B2B')")
-        if negotiate_btn.count() > 0:
-            click_locator_with_ripple(page, negotiate_btn.first, delay_after=3.0)
-
-        # Inside Negotiation Modal: show ultimatum letter and counter offer
-        time.sleep(2.5)
-        human_move(page, 960, 420)
-        time.sleep(3.0)
-        human_move(page, 960, 620)
-        time.sleep(3.0)
-
-        # Click "Appliquer -40% sur PayPal (/revise)"
-        apply_neg_btn = page.locator("button:has-text('Appliquer -40% sur PayPal')")
-        if apply_neg_btn.count() > 0:
-            click_locator_with_ripple(page, apply_neg_btn.first, delay_after=2.5)
-
-        # Close negotiation modal
-        close_neg = page.locator("div[role='dialog'] button, .fixed button:has-text('Fermer')")
-        if close_neg.count() > 0:
-            click_locator_with_ripple(page, close_neg.first, delay_after=1.5)
         else:
-            page.keyboard.press("Escape")
-            time.sleep(1.0)
+            print("  -> Fallback: locating trial trap button...")
+            fallback = page.locator("button:has-text('Simuler piège fin')")
+            if fallback.count() > 0:
+                click_locator_with_ripple(page, fallback.first, delay_after=1.8)
 
-        # Scroll to top of list and trigger Autonomous Sweep
-        page.mouse.wheel(0, -320)
+        # Spotlight the instant refund receipt ($49.00 refunded)
         time.sleep(1.5)
-        sweep_btn = page.locator("button:has-text('Optimiser les'), button:has-text('Optimiser les 2 abonnements')")
-        if sweep_btn.count() > 0:
-            click_locator_with_ripple(page, sweep_btn.first, delay_after=3.0)
+        human_move(page, 660, 320)
+        time.sleep(3.0)
 
-        # Highlight animated Health Score flipping to 98/100
-        human_move(page, 1050, 220)
-        time.sleep(4.0)
+        # Click on Developer X-Ray JSON Inspector button to reveal PayPal raw response
+        inspector_btn = page.locator("button:has-text('Developer X-Ray')")
+        if inspector_btn.count() == 0:
+            inspector_btn = page.locator("button:has-text('Inspect')")
+        if inspector_btn.count() > 0:
+            print("  -> Clicking PayPal Developer X-Ray...")
+            click_locator_with_ripple(page, inspector_btn.first, delay_after=1.8)
+            time.sleep(3.5)
+            # Close inspector
+            close_btn = page.locator("button:has-text('Close')")
+            if close_btn.count() > 0:
+                click_locator_with_ripple(page, close_btn.first, delay_after=1.0)
 
-        # Synchronize with audio
+        # Reset camera smoothly
+        page.evaluate("window.cameraReset(600)")
+        time.sleep(1.0)
+
+        # Synchronize with Scene 2 audio boundary (71.0s)
         elapsed = time.time() - start_time
-        if elapsed < 124.0:
-            time.sleep(124.0 - elapsed)
+        if elapsed < 71.0:
+            time.sleep(71.0 - elapsed)
 
         # -------------------------------------------------------------
-        # SCENE 4: Budget Guardrails, Orders v2 & CFO Boardpack (124s to ~172.5s)
+        # SCENE 3: SaaS Arbitrage & Gemini B2B Negotiation (71.0s to ~124.6s)
         # -------------------------------------------------------------
-        print("Scene 4: Zero-Trust Guardrails & CFO Boardpack...")
-        page.evaluate("window.showFeaturePill('🛡️', 'Budget Guardrails', 'PayPal Orders v2 & Model Context Protocol (MCP)', 9000)")
+        print("\n[SCENE 3] 1-Click SaaS Arbitrage & B2B Negotiation (71.0s - 124.6s)...")
+        page.evaluate("window.showChapter('03', 'SAAS ARBITRAGE & RETENTION', '1-Click Arbitrage & Gemini B2B Negotiation', 8000)")
 
-        # Focus right column
-        human_move(page, 1500, 320)
+        # Scroll down slightly to align Subscriptions Ledger
+        page.mouse.wheel(0, 220)
+        time.sleep(1.2)
+
+        # Zoom into subscriptions ledger
+        print("  -> Dynamic zoom onto #subscriptions-ledger (scale: 1.15)...")
+        page.evaluate("window.cameraZoomTo('#subscriptions-ledger', 1.15, 750, false)")
+        time.sleep(1.5)
+
+        # Find and click on CloudGPU Pro row to expand telemetry
+        gpu_row = page.locator("div:has-text('CloudGPU Pro')").first
+        if gpu_row.count() > 0:
+            print("  -> Expanding CloudGPU Pro telemetry...")
+            click_locator_with_ripple(page, gpu_row, delay_after=1.8)
+
+        # Hover over 1-Click SaaS Switch Arbitrage card
+        time.sleep(1.5)
+        switch_btn = page.locator("button:has-text('Switch to RunPod')")
+        if switch_btn.count() > 0:
+            print("  -> Triggering 1-Click SaaS Arbitrage (Switch to RunPod)...")
+            click_locator_with_ripple(page, switch_btn.first, delay_after=2.0)
+
+        # Find and click DesignFlow Enterprise row
+        design_row = page.locator("div:has-text('DesignFlow Enterprise')").first
+        if design_row.count() > 0:
+            print("  -> Expanding DesignFlow Enterprise telemetry...")
+            click_locator_with_ripple(page, design_row, delay_after=1.5)
+
+        # Click "Negotiate B2B Discount (-40%)"
+        neg_btn = page.locator("button:has-text('Negotiate B2B Discount')")
+        if neg_btn.count() > 0:
+            print("  -> Launching Gemini Autonomous Retention Negotiator...")
+            click_locator_with_ripple(page, neg_btn.first, delay_after=2.5)
+
+            # Camera zoom on the B2B modal
+            page.evaluate("window.cameraZoomTo('#b2b-modal', 1.15, 600, true)")
+            time.sleep(3.0)
+
+            # Click "Apply 40% Discount on PayPal via /revise"
+            apply_btn = page.locator("button:has-text('Apply 40% Discount')")
+            if apply_btn.count() == 0:
+                apply_btn = page.locator("button:has-text('Appliquer -40%')")
+            if apply_btn.count() > 0:
+                print("  -> Applying 40% discount on PayPal via /revise...")
+                click_locator_with_ripple(page, apply_btn.first, delay_after=2.0)
+
+            # Close negotiation modal if still open
+            close_modal = page.locator("button:has-text('Close')")
+            if close_modal.count() > 0:
+                click_locator_with_ripple(page, close_modal.first, delay_after=1.0)
+
+        # Reset camera
+        page.evaluate("window.cameraReset(600)")
+        time.sleep(1.0)
+
+        # Scroll up to trigger batch sweep button
+        page.mouse.wheel(0, -220)
+        time.sleep(1.5)
+
+        # Click "Optimize Subscriptions" batch sweep button
+        sweep_btn = page.locator("button:has-text('Optimize')")
+        if sweep_btn.count() > 0:
+            print("  -> Executing Autonomous Sweep...")
+            click_locator_with_ripple(page, sweep_btn.first, delay_after=2.5)
+
+        # Hover over transformed Health Score (98/100 A+)
+        time.sleep(1.5)
+        human_move(page, 1050, 185)
+        time.sleep(3.0)
+
+        # Synchronize with Scene 3 audio boundary (124.6s)
+        elapsed = time.time() - start_time
+        if elapsed < 124.6:
+            time.sleep(124.6 - elapsed)
+
+        # -------------------------------------------------------------
+        # SCENE 4: Agentic Commerce & Certified CFO Boardpack (124.6s to ~173.0s)
+        # -------------------------------------------------------------
+        print("\n[SCENE 4] Agentic Commerce & CFO Boardpack (124.6s - 173.0s)...")
+        page.evaluate("window.showChapter('04', 'AGENTIC COMMERCE', 'Zero-Trust Budget Guardrails & Orders v2', 8000)")
+
+        # Zoom into Guardrails & Purchases Panel
+        print("  -> Dynamic zoom onto #guardrails-panel (scale: 1.25)...")
+        page.evaluate("window.cameraZoomTo('#guardrails-panel', 1.25, 750, true)")
         time.sleep(2.0)
 
-        # Click Auto-approved purchase ($19.50)
-        quick_buy_19 = page.locator("button:has-text('19,50 $')").first
-        if quick_buy_19.count() > 0:
-            click_locator_with_ripple(page, quick_buy_19, delay_after=2.5)
+        # Test Scenario 1: $19.50 (Auto-approved under $25 threshold)
+        order_19 = page.locator("button:has-text('19,50')").or_(page.locator("button:has-text('19.50')"))
+        if order_19.count() > 0:
+            print("  -> Purchasing $19.50 GPU Credits (Zero-Click Auto-Approved)...")
+            click_locator_with_ripple(page, order_19.first, delay_after=2.0)
 
-        # Click 1-Click approval purchase ($65.00)
-        quick_buy_65 = page.locator("button:has-text('65,00 $')").first
-        if quick_buy_65.count() > 0:
-            click_locator_with_ripple(page, quick_buy_65, delay_after=2.5)
+        # Test Scenario 2: $65.00 (Exceeds $25 threshold -> Human Approval Queue)
+        order_65 = page.locator("button:has-text('65,00')").or_(page.locator("button:has-text('65.00')"))
+        if order_65.count() > 0:
+            print("  -> Submitting $65.00 Purchase (Approval Required)...")
+            click_locator_with_ripple(page, order_65.first, delay_after=2.0)
 
-        # Approve the 1-click pending order
-        approve_order_btn = page.locator("button:has-text('Approuver le paiement PayPal')").first
-        if approve_order_btn.count() > 0:
-            click_locator_with_ripple(page, approve_order_btn, delay_after=2.5)
+        # Approve the pending proposal in the 1-click queue
+        approve_btn = page.locator("button:has-text('Approve PayPal Order')")
+        if approve_btn.count() > 0:
+            print("  -> 1-Click Human Approval for $65.00 Order capture...")
+            click_locator_with_ripple(page, approve_btn.first, delay_after=2.2)
 
-        # Scroll back up to header
-        page.mouse.wheel(0, -420)
-        time.sleep(1.5)
+        # Reset camera before opening CFO Boardpack
+        page.evaluate("window.cameraReset(600)")
+        time.sleep(1.2)
 
-        # Click "Rapport CFO" in header
-        cfo_btn = page.locator("button:has-text('Rapport CFO')").first
+        # Display Chapter 5: CFO Governance
+        page.evaluate("window.showChapter('05', 'AUDIT & GOVERNANCE', 'Certified CFO Boardpack with SHA-256 Proof', 7500)")
+
+        # Scroll to top to access header button
+        page.mouse.wheel(0, -300)
+        time.sleep(1.0)
+
+        # Click "CFO Boardpack" button in header
+        cfo_btn = page.locator("button:has-text('CFO Boardpack')")
         if cfo_btn.count() > 0:
-            click_locator_with_ripple(page, cfo_btn.first, delay_after=3.0)
+            print("  -> Opening Certified CFO Boardpack modal...")
+            click_locator_with_ripple(page, cfo_btn.first, delay_after=2.2)
 
-        page.evaluate("window.showFeaturePill('📜', 'CFO Boardpack', 'Certified SHA-256 Cryptographic Audit Ledger', 8000)")
+            # Dynamic camera zoom on the CFO Boardpack modal
+            page.evaluate("window.cameraZoomTo('#cfo-modal', 1.15, 600, false)")
+            time.sleep(3.0)
 
-        # In CFO Boardpack modal: showcase metrics, table, and SHA-256 proof
-        human_move(page, 960, 320)
-        time.sleep(3.5)
-        human_move(page, 960, 520)
-        time.sleep(3.5)
-        human_move(page, 960, 720)
-        time.sleep(4.0)
+            # Hover KPI benchmark grid inside CFO Boardpack
+            human_move(page, 700, 320)
+            time.sleep(3.5)
 
-        # Synchronize with audio (172.5s)
+            # Hover cryptographic SHA-256 chain verification badge
+            human_move(page, 500, 520)
+            time.sleep(3.0)
+
+            # Close CFO Modal
+            cfo_close = page.locator("button:has-text('Print')").locator("xpath=..").locator("button").last
+            if cfo_close.count() > 0:
+                click_locator_with_ripple(page, cfo_close, delay_after=1.2)
+
+        # Reset camera
+        page.evaluate("window.cameraReset(600)")
+        time.sleep(1.0)
+
+        # Final showcase hover on top brand bar
+        human_move(page, 960, 400)
+
+        # Synchronize with master audio duration (~173.0s)
         elapsed = time.time() - start_time
-        if elapsed < 172.5:
-            time.sleep(172.5 - elapsed)
+        if elapsed < 173.0:
+            time.sleep(173.0 - elapsed)
 
-        print(f"Big Tech choreography completed in {time.time() - start_time:.2f}s!")
+        print(f"\nChoreographed recording completed in {time.time() - start_time:.2f}s!")
 
         # Finalize video recording
         page.close()
@@ -458,16 +673,29 @@ def merge_video_and_audio():
 
     raw_video = max(video_files, key=os.path.getctime)
     master_audio = "video_production/audio/master_voiceover.mp3"
+    subs_file = "video_production/sentinelpay_subs.srt"
     output_mp4 = "sentinelpay_demo.mp4"
 
-    print(f"\nMerging {raw_video} with {master_audio} into {output_mp4} with high-definition MP4...")
+    # Forward slash path for FFmpeg subtitles filter
+    subs_formatted = subs_file.replace("\\", "/")
+
+    print(f"\nMerging {raw_video} with {master_audio} and burning subtitles ({subs_file}) into {output_mp4}...")
+
+    # High-accessibility Apple-style subtitles: pure white bold text on semi-transparent dark obsidian pill
+    subtitles_filter = (
+        f"subtitles={subs_formatted}:force_style="
+        "'Fontname=Arial,FontSize=20,PrimaryColour=&H00FFFFFF,BackColour=&HB00C121D,"
+        "BorderStyle=3,Outline=0,Shadow=0,MarginV=44,Alignment=2,Bold=1,Spacing=0.5'"
+    )
+
     cmd = [
         FFMPEG_EXE, "-y",
         "-i", raw_video,
         "-i", master_audio,
+        "-vf", subtitles_filter,
         "-c:v", "libx264",
         "-preset", "medium",
-        "-crf", "20",
+        "-crf", "19",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",
@@ -477,7 +705,7 @@ def merge_video_and_audio():
 
     subprocess.run(cmd, check=True)
     size_mb = os.path.getsize(output_mp4) / (1024 * 1024)
-    print(f"\nSUCCESS! Master Big Tech demo video produced: {output_mp4} ({size_mb:.2f} MB)")
+    print(f"\nSUCCESS! Master Big Tech demo video produced with subtitles: {output_mp4} ({size_mb:.2f} MB)")
 
 
 if __name__ == "__main__":

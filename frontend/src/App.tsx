@@ -48,7 +48,7 @@ import {
 } from './types';
 
 function formatUSD(value: number): string {
-  return new Intl.NumberFormat('fr-FR', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
@@ -126,7 +126,7 @@ function RevolutSparkline({
       height={22}
       viewBox="0 0 56 22"
       className="shrink-0 overflow-visible"
-      aria-label="Trajectoire tarifaire 6 mois"
+      aria-label="6-month pricing trajectory"
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
@@ -154,14 +154,14 @@ function RevolutPriceDeltaBadge({ priceDeltaPct }: { priceDeltaPct: number }) {
   if (priceDeltaPct > 0) {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] font-semibold tabular-figure bg-[#FFF0F0] text-[#C53030] border border-[#C53030]/20">
-        ▲ +{priceDeltaPct.toFixed(1).replace('.', ',')} %
+        ▲ +{priceDeltaPct.toFixed(1)}%
       </span>
     );
   }
   if (priceDeltaPct < 0) {
     return (
       <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] font-semibold tabular-figure bg-[#EAF7F0] text-[#0E7C47] border border-[#0E7C47]/20">
-        ▼ {priceDeltaPct.toFixed(1).replace('.', ',')} %
+        ▼ {priceDeltaPct.toFixed(1)}%
       </span>
     );
   }
@@ -192,7 +192,7 @@ function PayPalJsonInspectorButton({
         className="pressable inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-white border border-[#CBD5E1] hover:border-[#0070BA] text-[11px] font-medium text-[#003087]"
       >
         <Code2 className="w-3 h-3 text-[#0070BA]" />
-        <span>{open ? 'Masquer JSON PayPal' : 'Inspecter JSON PayPal'}</span>
+        <span>{open ? 'Hide PayPal JSON' : 'Inspect PayPal JSON'}</span>
       </button>
 
       {open && (
@@ -205,7 +205,7 @@ function PayPalJsonInspectorButton({
               PayPal-Request-Id: {receipt.paypal_request_id}
             </span>
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0E7C47]/30 text-[#6EE7B7]">
-              {auditChainVerified ? 'Chaîne SHA-256 vérifiée' : 'Audit SHA-256 actif'}
+              {auditChainVerified ? 'SHA-256 Chain Verified' : 'SHA-256 Audit Active'}
             </span>
           </div>
           <pre className="overflow-x-auto text-[10px] leading-relaxed text-[#E2E8F0] max-h-48">
@@ -636,7 +636,7 @@ export default function App() {
       return {
         amountClass: 'text-[#C53030]',
         borderHoverClass: 'hover:border-[#C53030]',
-        statusLabel: 'Bloqué',
+        statusLabel: 'Blocked by Cap',
         ruleLabel: `Hors plafond (${formatUSD(monthlyLimit)})`,
       };
     }
@@ -644,14 +644,14 @@ export default function App() {
       return {
         amountClass: 'text-[#0E7C47]',
         borderHoverClass: 'hover:border-[#0E7C47]',
-        statusLabel: 'Auto-validé',
+        statusLabel: 'Auto-Approved',
         ruleLabel: `≤ seuil ${formatUSD(autoThreshold)}`,
       };
     }
     return {
       amountClass: 'text-[#B45309]',
       borderHoverClass: 'hover:border-[#0070BA]',
-      statusLabel: 'Approbation 1 clic',
+      statusLabel: 'Requires 1-Click',
       ruleLabel: `> seuil ${formatUSD(autoThreshold)}`,
     };
   };
@@ -662,9 +662,9 @@ export default function App() {
 
   const getActionButtonLabel = (sub: SubscriptionItem): string => {
     if (sub.recommended_action === 'DOWNGRADE_PLAN' && sub.downgrade_option) {
-      return `Passer au forfait ${sub.downgrade_option.target_plan_name.split(' ')[0]} (${formatUSD(
+      return `Downgrade to ${sub.downgrade_option.target_plan_name.split(' ')[0]} (${formatUSD(
         sub.downgrade_option.new_monthly_cost
-      )}/mois)`;
+      )}/mo)`;
     }
     if (sub.recommended_action === 'SUSPEND_SUBSCRIPTION') {
       return 'Suspendre le prélèvement';
@@ -755,7 +755,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-xs text-[#718096] hidden sm:block">
-                Audit des abonnements récurrents, arbitrage SaaS et pare-feu Webhooks PayPal
+                Autonomous Recurring SaaS Audit, 1-Click Arbitrage & PayPal Webhook Firewall
               </p>
             </div>
           </div>
@@ -770,8 +770,8 @@ export default function App() {
               />
               <span>
                 {system_status.paypal_oauth_verified
-                  ? 'PayPal Sandbox connecté (Live OAuth2)'
-                  : 'PayPal Sandbox (Mode simulation prêt)'}
+                  ? 'PayPal Sandbox Connected (Live OAuth2)'
+                  : 'PayPal Sandbox (Simulator Active)'}
               </span>
             </div>
 
@@ -783,7 +783,7 @@ export default function App() {
                 className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] text-xs font-medium text-[#0C121D]"
               >
                 <Database className="w-3.5 h-3.5 text-[#0070BA]" />
-                <span>Provisionner Sandbox</span>
+                <span>Seed Sandbox</span>
               </button>
             )}
 
@@ -795,7 +795,7 @@ export default function App() {
               title="Générer le rapport d'audit CFO certifié"
             >
               <FileText className="w-3.5 h-3.5 text-white" />
-              <span>{cfoLoading ? 'Génération…' : 'Rapport CFO'}</span>
+              <span>{cfoLoading ? 'Generating…' : 'CFO Boardpack'}</span>
             </button>
 
             <button
@@ -804,7 +804,7 @@ export default function App() {
               className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] text-xs font-medium text-[#0C121D]"
             >
               <KeyRound className="w-3.5 h-3.5 text-[#003087]" />
-              <span>Clés API</span>
+              <span>API Keys</span>
             </button>
 
             <button
@@ -812,10 +812,10 @@ export default function App() {
               onClick={handleResetDemo}
               disabled={busyId === 'RESET'}
               className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] text-xs font-medium text-[#4A5568]"
-              title="Réinitialiser la démonstration"
+              title="Reset Demo la démonstration"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Réinitialiser</span>
+              <span className="hidden sm:inline">Reset Demo</span>
             </button>
           </div>
         </div>
@@ -831,18 +831,18 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-6 pt-7 space-y-6">
         {/* Primary Focal Point: PayPal Capital Recovery Banner (with 60fps Apple Number Ticker & Financial Health Score) */}
-        <section className="rounded-2xl bg-[#003087] text-white p-6 sm:p-8 shadow-sm space-y-5">
+        <section id="kpi-banner" className="rounded-2xl bg-[#003087] text-white p-6 sm:p-8 shadow-sm space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             <div className="lg:col-span-7 space-y-2.5">
               <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 text-xs font-medium text-[#D6ECFF]">
-                <span>Synthèse financière du portefeuille PayPal</span>
+                <span>PayPal Portfolio Financial Synthesis</span>
                 <span>•</span>
                 <span>{executive_ai_brief.provider}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-semibold heading-tight tabular-figure">
                 {kpis.potential_annual_savings_usd > 0
-                  ? `${formatUSD(animatedPotentialSavings)} d’économies annuelles identifiées sur ${kpis.flagged_subscriptions_count} abonnements`
-                  : `Portefeuille optimisé : ${formatUSD(animatedRealizedSavings)} économisés cette année`}
+                  ? `${formatUSD(animatedPotentialSavings)} annual savings identified across ${kpis.flagged_subscriptions_count} subscriptions`
+                  : `Optimized Portfolio: ${formatUSD(animatedRealizedSavings)} saved this year`}
               </h1>
               <p className="text-sm text-[#D6ECFF]/90 max-w-2xl leading-relaxed">
                 {executive_ai_brief.executive_summary}
@@ -851,13 +851,13 @@ export default function App() {
 
             <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center justify-end gap-3">
               <div className="bg-white/10 rounded-xl px-4 py-3 border border-white/10 flex-1">
-                <div className="text-xs text-[#D6ECFF]">Prélèvements mensuels actifs</div>
+                <div className="text-xs text-[#D6ECFF]">Active Monthly Commitments</div>
                 <div className="text-xl font-semibold tabular-figure mt-0.5">
                   {formatUSD(animatedMonthlySpend)}
-                  <span className="text-xs font-normal text-[#D6ECFF]"> / mois</span>
+                  <span className="text-xs font-normal text-[#D6ECFF]"> / mo</span>
                 </div>
                 <div className="text-xs text-[#9AE6B4] mt-1 tabular-figure">
-                  Économies déjà validées : {formatUSD(animatedRealizedSavings)}/an
+                  Realized Savings: {formatUSD(animatedRealizedSavings)}/yr
                 </div>
               </div>
 
@@ -869,10 +869,8 @@ export default function App() {
                   className="pressable px-5 py-3.5 rounded-xl bg-white text-[#003087] hover:bg-[#F8FAFC] font-semibold text-sm shadow-sm shrink-0 tabular-figure"
                 >
                   {busyId === 'SWEEP'
-                    ? 'Exécution PayPal en cours…'
-                    : `Optimiser les ${kpis.flagged_subscriptions_count} abonnements (${formatUSD(
-                        animatedPotentialSavings
-                      )}/an)`}
+                    ? 'Executing PayPal Sweep…'
+                    : `Optimize ${kpis.flagged_subscriptions_count} Subscriptions (${formatUSD(animatedPotentialSavings)}/yr)`}
                 </button>
               ) : (
                 <button
@@ -880,7 +878,7 @@ export default function App() {
                   onClick={handleResetDemo}
                   className="pressable px-5 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-medium text-sm shrink-0"
                 >
-                  Restaurer l’état initial de démo
+                  Reset Demo State
                 </button>
               )}
             </div>
@@ -892,10 +890,10 @@ export default function App() {
               <div className="flex-1">
                 <div className="flex items-center justify-between text-xs mb-1.5">
                   <span className="text-[#D6ECFF] font-medium">
-                    Score de santé financière PayPal
+                    PayPal Financial Health Score
                   </span>
                   <span className="font-semibold tabular-figure text-white">
-                    Score de santé : {animatedHealthScore}/100
+                    Health Score: {animatedHealthScore}/100
                   </span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-white/15 overflow-hidden">
@@ -915,18 +913,18 @@ export default function App() {
 
             <div className="md:col-span-7 flex flex-wrap items-center justify-between md:justify-end gap-3 text-xs tabular-figure">
               <span className="px-3 py-1.5 rounded-lg bg-white/10 text-[#D6ECFF]">
-                Avant : <strong>{formatUSD(baselineMonthlySpend)}/mois</strong> → Maintenant :{' '}
-                <strong className="text-[#9AE6B4]">{formatUSD(animatedMonthlySpend)}/mois</strong>
+                Before: <strong>{formatUSD(baselineMonthlySpend)}/mo</strong> → Current:{' '}
+                <strong className="text-[#9AE6B4]">{formatUSD(animatedMonthlySpend)}/mo</strong>
               </span>
               <span className="px-3 py-1.5 rounded-lg bg-white/10 text-[#9AE6B4] font-medium">
-                Gain net : +{formatUSD(animatedRealizedSavings)}/an
+                Net Gain: +{formatUSD(animatedRealizedSavings)}/yr
               </span>
             </div>
           </div>
         </section>
 
         {/* Live PayPal Webhook Trap Firewall Bar (The 30-Second Jaw-Drop Demo Moment) */}
-        <section className="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(12,18,29,0.03)] space-y-3.5">
+        <section id="webhook-firewall" className="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(12,18,29,0.03)] space-y-3.5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
             <div className="flex items-start sm:items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#FFF0F0] border border-[#C53030]/20 flex items-center justify-center text-[#C53030] shrink-0">
@@ -935,7 +933,7 @@ export default function App() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-sm font-semibold text-[#0C121D]">
-                    Pare-feu temps réel PayPal Webhooks (
+                    Real-Time PayPal Webhook Firewall (
                     <code className="font-mono text-xs text-[#003087]">PAYMENT.SALE.COMPLETED</code>{' '}
                     &{' '}
                     <code className="font-mono text-xs text-[#003087]">
@@ -944,12 +942,11 @@ export default function App() {
                     )
                   </h2>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#EAF7F0] text-[#0E7C47]">
-                    <Zap className="w-3 h-3" /> Surveillance Zero-Trust active
+                    <Zap className="w-3 h-3" /> Zero-Trust Monitoring Active
                   </span>
                 </div>
                 <p className="text-xs text-[#718096] mt-0.5">
-                  Intercepte les conversions d’essais gratuits et hausses furtives dès réception du
-                  webhook signé PayPal, suspend l’accord et déclenche le remboursement instantané.
+                  Intercepts free trial traps and stealth price hikes upon receiving cryptographically signed PayPal webhooks, suspends the billing agreement, and triggers instant capture refund.
                 </p>
               </div>
             </div>
@@ -962,8 +959,8 @@ export default function App() {
                 className="pressable px-3.5 py-2 rounded-xl bg-[#FFF0F0] hover:bg-[#FEE2E2] text-[#C53030] border border-[#C53030]/25 text-xs font-semibold tabular-figure"
               >
                 {busyId === 'WEBHOOK-TRIAL_CONVERSION'
-                  ? 'Interception Webhook…'
-                  : 'Simuler piège fin d’essai 1 $ → 49 $'}
+                  ? 'Intercepting Webhook…'
+                  : 'Simulate Trial Trap $1 → $49'}
               </button>
               <button
                 type="button"
@@ -972,8 +969,8 @@ export default function App() {
                 className="pressable px-3.5 py-2 rounded-xl bg-[#FEF5E7] hover:bg-[#FDE68A]/50 text-[#B45309] border border-[#B45309]/25 text-xs font-semibold tabular-figure"
               >
                 {busyId === 'WEBHOOK-PRICE_HIKE'
-                  ? 'Interception Webhook…'
-                  : 'Simuler hausse furtive +169 % (39 $)'}
+                  ? 'Intercepting Webhook…'
+                  : 'Simulate Stealth Hike +169% ($39)'}
               </button>
             </div>
           </div>
@@ -984,9 +981,9 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#0E7C47] shrink-0" />
                   <span className="text-xs font-semibold text-[#0E7C47]">
-                    Remboursement PayPal exécuté : +
-                    {formatUSD(webhookInterception.intercepted_amount_usd)} recrédités •{' '}
-                    {formatUSD(webhookInterception.annual_saved_usd)}/an sauvés
+                    Instant PayPal Refund Executed: +
+                    {formatUSD(webhookInterception.intercepted_amount_usd)} refunded •{' '}
+                    {formatUSD(webhookInterception.annual_saved_usd)}/yr saved
                   </span>
                 </div>
                 <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-white border border-[#0E7C47]/20 text-[#0E7C47]">
@@ -997,7 +994,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#0C121D]">
                 <div className="bg-white/90 rounded-lg p-2.5 border border-[#0E7C47]/15">
                   <div className="text-[11px] text-[#718096]">
-                    1. Suspension immédiate de l’accord PayPal
+                    1. Immediate PayPal Agreement Suspension (/suspend)
                   </div>
                   <div className="font-mono text-[11px] text-[#0C121D] mt-0.5">
                     {webhookInterception.suspend_receipt.http_method}{' '}
@@ -1007,11 +1004,11 @@ export default function App() {
                 </div>
                 <div className="bg-white/90 rounded-lg p-2.5 border border-[#0E7C47]/15">
                   <div className="text-[11px] text-[#718096]">
-                    2. Remboursement automatique de la capture ({webhookInterception.descriptor})
+                    2. Automated Capture Refund ({webhookInterception.descriptor})
                   </div>
                   <div className="font-mono text-[11px] text-[#0E7C47] font-semibold mt-0.5">
                     {webhookInterception.refund_receipt.http_method}{' '}
-                    {webhookInterception.refund_receipt.endpoint} → Réf.{' '}
+                    {webhookInterception.refund_receipt.endpoint} → Ref.{' '}
                     {webhookInterception.refund_receipt.paypal_resource_id}
                   </div>
                 </div>
@@ -1028,17 +1025,16 @@ export default function App() {
         {/* Main 2-Column Asymmetric Financial Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
           {/* LEFT COLUMN (7 cols): Recurring PayPal Subscriptions Ledger */}
-          <div className="lg:col-span-7 space-y-5">
+          <div id="subscriptions-ledger" className="lg:col-span-7 space-y-5">
             <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-[0_1px_2px_rgba(12,18,29,0.03)]">
               {/* Header + Apple Segmented Filter Control */}
               <div className="px-6 py-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="text-[17px] font-semibold heading-tight text-[#0C121D]">
-                    Abonnements récurrents PayPal
+                    PayPal Recurring Subscriptions
                   </h2>
                   <p className="text-xs text-[#718096]">
-                    Cliquez sur une ligne pour inspecter la télémétrie, l’arbitrage IA et le reçu
-                    PayPal
+                    Click any row to inspect telemetry, AI arbitrage, and cryptographic PayPal receipts
                   </p>
                 </div>
 
@@ -1053,7 +1049,7 @@ export default function App() {
                         : 'text-[#4A5568] hover:text-[#0C121D]'
                     }`}
                   >
-                    Tous ({subscriptions.length})
+                    All ({subscriptions.length})
                   </button>
                   <button
                     type="button"
@@ -1064,7 +1060,7 @@ export default function App() {
                         : 'text-[#4A5568] hover:text-[#0C121D]'
                     }`}
                   >
-                    À optimiser ({kpis.flagged_subscriptions_count})
+                    Actionable ({kpis.flagged_subscriptions_count})
                   </button>
                   <button
                     type="button"
@@ -1075,7 +1071,7 @@ export default function App() {
                         : 'text-[#4A5568] hover:text-[#0C121D]'
                     }`}
                   >
-                    Traités ({subscriptions.filter((s) => s.status !== 'ACTIVE').length})
+                    Optimized ({subscriptions.filter((s) => s.status !== 'ACTIVE').length})
                   </button>
                 </div>
               </div>
@@ -1135,7 +1131,7 @@ export default function App() {
                               {getStatusBadge(sub)}
                             </div>
                             <div className="text-xs text-[#718096] mt-0.5 truncate">
-                              {sub.plan_name} • Accord PayPal{' '}
+                              {sub.plan_name} • PayPal Agreement{' '}
                               <code className="font-mono text-[11px] text-[#4A5568]">
                                 {sub.paypal_subscription_id}
                               </code>
@@ -1161,7 +1157,7 @@ export default function App() {
                                 )}
                               <div className="font-semibold text-[15px] tabular-figure text-[#0C121D]">
                                 {formatUSD(sub.monthly_cost)}
-                                <span className="text-xs font-normal text-[#718096]">/mois</span>
+                                <span className="text-xs font-normal text-[#718096]">/mo</span>
                               </div>
                             </div>
                             <div className="mt-1 flex items-center justify-end gap-2">
@@ -1170,7 +1166,7 @@ export default function App() {
                               />
                               {canOptimize && (
                                 <span className="text-xs font-medium text-[#0070BA] tabular-figure">
-                                  Économie : {formatUSD(sub.estimated_annual_savings)}/an
+                                  Savings: {formatUSD(sub.estimated_annual_savings)}/yr
                                 </span>
                               )}
                             </div>
@@ -1189,26 +1185,26 @@ export default function App() {
                         <div className="px-6 pb-5 pt-1 border-t border-[#E2E8F0]/60 space-y-4">
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                             <div className="bg-white border border-[#E2E8F0] rounded-xl p-3">
-                              <div className="text-[11px] text-[#718096]">Jours actifs (30 j)</div>
+                              <div className="text-[11px] text-[#718096]">Active Days (30d)</div>
                               <div className="text-sm font-semibold tabular-figure mt-0.5">
-                                {sub.telemetry.active_days_last_30d} / 30 jours
+                                {sub.telemetry.active_days_last_30d} / 30 days
                               </div>
                             </div>
                             <div className="bg-white border border-[#E2E8F0] rounded-xl p-3">
-                              <div className="text-[11px] text-[#718096]">Sièges utilisés</div>
+                              <div className="text-[11px] text-[#718096]">Active Seats</div>
                               <div className="text-sm font-semibold tabular-figure mt-0.5">
                                 {sub.telemetry.active_seats} / {sub.telemetry.provisioned_seats}{' '}
-                                siège(s)
+                                seat(s)
                               </div>
                             </div>
                             <div className="bg-white border border-[#E2E8F0] rounded-xl p-3">
-                              <div className="text-[11px] text-[#718096]">Coût par jour actif</div>
+                              <div className="text-[11px] text-[#718096]">Cost per Active Day</div>
                               <div className="text-sm font-semibold tabular-figure mt-0.5">
                                 {formatUSD(sub.cost_per_active_day)}
                               </div>
                             </div>
                             <div className="bg-white border border-[#E2E8F0] rounded-xl p-3">
-                              <div className="text-[11px] text-[#718096]">Score d’inactivité</div>
+                              <div className="text-[11px] text-[#718096]">Waste Score</div>
                               <div className="text-sm font-semibold tabular-figure mt-0.5">
                                 {sub.waste_score} / 100
                               </div>
@@ -1224,15 +1220,15 @@ export default function App() {
                                 <div>
                                   <div className="text-xs font-semibold text-[#0C121D] tabular-figure flex items-center gap-2 flex-wrap">
                                     <span>
-                                      Ancien tarif : {formatUSD(sub.telemetry.previous_monthly_cost)}{' '}
-                                      → Tarif actuel : {formatUSD(sub.monthly_cost)}
+                                      Previous Rate: {formatUSD(sub.telemetry.previous_monthly_cost)}{' '}
+                                      → Current Rate: {formatUSD(sub.monthly_cost)}
                                     </span>
                                     <RevolutPriceDeltaBadge
                                       priceDeltaPct={sub.telemetry.price_change_pct_last_90d}
                                     />
                                   </div>
                                   <div className="text-[11px] text-[#718096] mt-0.5 font-mono">
-                                    Relevé : {sub.telemetry.raw_paypal_descriptor} • Historique 6m :{' '}
+                                    Descriptor: {sub.telemetry.raw_paypal_descriptor} • 6-Month Trend:{' '}
                                     {sub.telemetry.price_history_6m
                                       .map((p) => formatUSD(p))
                                       .join(' → ')}
@@ -1243,12 +1239,11 @@ export default function App() {
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {sub.telemetry.has_data_retention_or_contract_lock ? (
                                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[#FEF5E7] text-[#B45309] border border-[#B45309]/20">
-                                    Verrouillage données / contrat actif (Suspension /suspend
-                                    privilégiée)
+                                    Data Retention / Contract Lock Active (/suspend preferred)
                                   </span>
                                 ) : (
                                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[#EAF7F0] text-[#0E7C47] border border-[#0E7C47]/20">
-                                    Aucun verrouillage de données (Résiliation directe sûre)
+                                    No Data Lock (Safe Direct /cancel)
                                   </span>
                                 )}
                               </div>
@@ -1258,7 +1253,7 @@ export default function App() {
                           <div className="bg-white border border-[#E2E8F0] rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="space-y-1">
                               <div className="text-xs font-semibold text-[#003087]">
-                                Diagnostic d’utilisation
+                                Usage Telemetry & Rationale
                               </div>
                               <p className="text-xs text-[#4A5568] leading-relaxed">
                                 {sub.ai_audit_rationale}
@@ -1276,7 +1271,7 @@ export default function App() {
                                 className="pressable px-4 py-2.5 rounded-xl bg-[#0070BA] hover:bg-[#003087] text-white text-xs font-semibold shrink-0 shadow-sm"
                               >
                                 {busyId === sub.id
-                                  ? 'Appel API PayPal…'
+                                  ? 'Calling PayPal API…'
                                   : getActionButtonLabel(sub)}
                               </button>
                             )}
@@ -1289,7 +1284,7 @@ export default function App() {
                                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#003087]">
                                   <ArrowRightLeft className="w-3.5 h-3.5 text-[#0070BA]" />
                                   <span>
-                                    Arbitrage IA / Alternative recommandée :{' '}
+                                    AI Arbitrage / Recommended Alternative:{' '}
                                     {sub.switch_alternative.alternative_vendor} (
                                     {sub.switch_alternative.alternative_plan})
                                   </span>
@@ -1297,8 +1292,8 @@ export default function App() {
                                 <p className="text-xs text-[#4A5568] leading-relaxed">
                                   {sub.switch_alternative.migration_rationale} •{' '}
                                   <strong className="text-[#0E7C47] tabular-figure">
-                                    Économie nette :{' '}
-                                    {formatUSD(sub.switch_alternative.annual_net_savings)}/an
+                                    Net Savings:{' '}
+                                    {formatUSD(sub.switch_alternative.annual_net_savings)}/yr
                                   </strong>
                                 </p>
                               </div>
@@ -1313,12 +1308,12 @@ export default function App() {
                                 className="pressable px-4 py-2.5 rounded-xl bg-[#003087] hover:bg-[#001C64] text-white text-xs font-semibold shrink-0 shadow-sm tabular-figure"
                               >
                                 {busyId === `SWITCH-${sub.id}`
-                                  ? 'Arbitrage PayPal en cours…'
-                                  : `Remplacer par ${
+                                  ? 'Executing PayPal Arbitrage…'
+                                  : `Switch to ${
                                       sub.switch_alternative.alternative_vendor
                                     } (${formatUSD(
                                       sub.switch_alternative.new_monthly_cost
-                                    )}/mois)`}
+                                    )}/mo)`}
                               </button>
                             </div>
                           )}
@@ -1329,10 +1324,10 @@ export default function App() {
                               <div className="space-y-1">
                                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#003087]">
                                   <Handshake className="w-3.5 h-3.5 text-[#003087]" />
-                                  <span>Négociation B2B Autonome (Gemini AI Copilot)</span>
+                                  <span>Autonomous B2B Retention Negotiation (Gemini AI)</span>
                                 </div>
                                 <p className="text-xs text-[#4A5568] leading-relaxed">
-                                  Générer une mise en demeure formelle sur la télémétrie réelle et obtenir -40% de remise entreprise via l'API PayPal /revise.
+                                  Generate formal legal notice based on verified telemetry and obtain a 40% enterprise discount via PayPal /revise.
                                 </p>
                               </div>
                               <button
@@ -1345,8 +1340,8 @@ export default function App() {
                                 className="pressable px-3.5 py-2 rounded-xl bg-white border border-[#003087]/30 hover:border-[#003087] text-[#003087] text-xs font-semibold shrink-0 shadow-xs hover:bg-[#F0F4FF] transition-all"
                               >
                                 {negotiationLoading && negotiatingSub?.id === sub.id
-                                  ? 'Négociation en cours…'
-                                  : 'Négocier remise B2B (-40%)'}
+                                  ? 'Negotiating…'
+                                  : 'Negotiate B2B Discount (-40%)'}
                               </button>
                             </div>
                           )}
@@ -1357,7 +1352,7 @@ export default function App() {
                               <div className="flex items-center justify-between">
                                 <span className="font-semibold text-[#0E7C47] flex items-center gap-1.5">
                                   <CheckCircle2 className="w-3.5 h-3.5" />
-                                  Reçu d’exécution PayPal (
+                                  PayPal Execution Receipt (
                                   {matchingProposal.paypal_receipt.execution_mode})
                                 </span>
                                 <code className="font-mono text-[11px] text-[#0E7C47]">
@@ -1387,11 +1382,10 @@ export default function App() {
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-3 shadow-[0_1px_2px_rgba(12,18,29,0.03)]">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-[#0C121D]">
-                  Instruction directe en langage naturel
+                  Natural Language Financial Command
                 </h3>
                 <span className="text-xs text-[#718096]">
-                  Ex. « Achète 18 $ de crédits GPU via PayPal » ou « Résilie les abonnements
-                  inactifs »
+                  E.g., "Buy $18 in GPU credits via PayPal" or "Cancel idle SaaS subscriptions"
                 </span>
               </div>
 
@@ -1400,7 +1394,7 @@ export default function App() {
                   type="text"
                   value={commandInput}
                   onChange={(e) => setCommandInput(e.target.value)}
-                  placeholder="Saisissez une instruction d’audit ou d’achat PayPal…"
+                  placeholder="Enter an autonomous treasury instruction or purchase order…"
                   className="flex-1 rounded-xl border border-[#CBD5E1] px-3.5 py-2.5 text-sm text-[#0C121D] placeholder-[#94A3B8] focus:outline-none focus:border-[#0070BA]"
                 />
                 <button
@@ -1409,7 +1403,7 @@ export default function App() {
                   className="pressable px-4 py-2.5 rounded-xl bg-[#003087] hover:bg-[#001C64] text-white text-sm font-medium inline-flex items-center gap-2 shrink-0"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>{commandBusy ? 'Analyse…' : 'Exécuter'}</span>
+                  <span>{commandBusy ? 'Analyzing…' : 'Execute'}</span>
                 </button>
               </form>
 
@@ -1422,7 +1416,7 @@ export default function App() {
           </div>
 
           {/* RIGHT COLUMN (5 cols): Budget Guardrails, 1-Click Approval Queue & PayPal Orders v2 */}
-          <div className="lg:col-span-5 space-y-5">
+          <div id="guardrails-panel" className="lg:col-span-5 space-y-5">
             {/* 1-Click Human Approval Queue (Highlighted when items are waiting) */}
             {pendingApprovals.length > 0 && (
               <div className="bg-white border-2 border-[#0070BA] rounded-2xl p-5 space-y-3.5 shadow-sm">
@@ -1430,11 +1424,11 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[#0070BA]" />
                     <h3 className="text-[15px] font-semibold text-[#0C121D]">
-                      En attente d’approbation en 1 clic ({pendingApprovals.length})
+                      Pending 1-Click Approvals ({pendingApprovals.length})
                     </h3>
                   </div>
                   <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[#E8F3FF] text-[#003087]">
-                    Validation requise
+                    Action Required
                   </span>
                 </div>
 
@@ -1463,8 +1457,8 @@ export default function App() {
                         className="pressable w-full py-2.5 px-4 rounded-xl bg-[#0070BA] hover:bg-[#003087] text-white text-xs font-semibold shadow-sm"
                       >
                         {busyId === prop.proposal_id
-                          ? 'Création de l’ordre PayPal v2…'
-                          : `Approuver le paiement PayPal (${formatUSD(prop.amount_usd)})`}
+                          ? 'Creating PayPal Order v2…'
+                          : `Approve PayPal Order (${formatUSD(prop.amount_usd)})`}
                       </button>
                     </div>
                   ))}
@@ -1478,7 +1472,7 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-[#003087]" />
                   <h3 className="text-[15px] font-semibold text-[#0C121D]">
-                    Contrôle budgétaire des achats autonomes
+                    Autonomous Budget Guardrails
                   </h3>
                 </div>
                 <SlidersHorizontal className="w-4 h-4 text-[#718096]" />
@@ -1488,13 +1482,13 @@ export default function App() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="text-[#4A5568]">
-                    Utilisé ce mois :{' '}
+                    Spent this month:{' '}
                     <strong className="text-[#0C121D] tabular-figure">
                       {formatUSD(kpis.autonomous_budget_spent_usd)}
                     </strong>
                   </span>
                   <span className="text-[#4A5568] tabular-figure">
-                    Plafond : {formatUSD(monthlyLimit)}
+                    Monthly Cap: {formatUSD(monthlyLimit)}
                   </span>
                 </div>
                 <div className="w-full h-2.5 bg-[#E2E8F0] rounded-full overflow-hidden">
@@ -1504,8 +1498,8 @@ export default function App() {
                   />
                 </div>
                 <div className="text-[11px] text-[#718096] flex justify-between tabular-figure">
-                  <span>Disponible : {formatUSD(liveRemainingBudget)}</span>
-                  <span>Auto-validation ≤ {formatUSD(autoThreshold)}</span>
+                  <span>Remaining: {formatUSD(liveRemainingBudget)}</span>
+                  <span>Auto-Approve ≤ {formatUSD(autoThreshold)}</span>
                 </div>
               </div>
 
@@ -1513,7 +1507,7 @@ export default function App() {
               <div className="pt-2 border-t border-[#E2E8F0] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <label className="block text-[#4A5568] mb-1 tabular-figure">
-                    Plafond mensuel ({formatUSD(monthlyLimit)})
+                    Monthly Cap ({formatUSD(monthlyLimit)})
                   </label>
                   <input
                     type="range"
@@ -1530,7 +1524,7 @@ export default function App() {
                 </div>
                 <div>
                   <label className="block text-[#4A5568] mb-1 tabular-figure">
-                    Seuil sans clic ({formatUSD(autoThreshold)})
+                    Zero-Click Threshold ({formatUSD(autoThreshold)})
                   </label>
                   <input
                     type="range"
@@ -1552,10 +1546,10 @@ export default function App() {
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-4 shadow-[0_1px_2px_rgba(12,18,29,0.03)]">
               <div>
                 <h3 className="text-[15px] font-semibold text-[#0C121D]">
-                  Achats autonomes PayPal Orders v2
+                  Autonomous Purchases (PayPal Orders v2)
                 </h3>
                 <p className="text-xs text-[#718096] mt-0.5">
-                  Testez les 3 niveaux de règles budgétaires sur l’endpoint{' '}
+                  Test the 3 policy tiers against the live endpoint{' '}
                   <code className="font-mono text-[11px]">/v2/checkout/orders</code>
                 </p>
               </div>
@@ -1567,9 +1561,9 @@ export default function App() {
                   onClick={() =>
                     handleQuickPurchaseScenario(
                       'RunPod GPU Cloud',
-                      'Recharge crédits API',
+                      'API Credit Top-up',
                       19.5,
-                      `Ordre test (${formatUSD(19.5)}) face au seuil ${formatUSD(autoThreshold)}`
+                      `Test order (${formatUSD(19.5)}) vs auto-approval threshold ${formatUSD(autoThreshold)}`
                     )
                   }
                   disabled={busyId === 'PURCHASE-19.5'}
@@ -1591,9 +1585,9 @@ export default function App() {
                   onClick={() =>
                     handleQuickPurchaseScenario(
                       'Anthropic Enterprise',
-                      'Pack Tokens Production',
+                      'Production Token Pack',
                       65.0,
-                      `Ordre test (${formatUSD(65.0)}) face au seuil ${formatUSD(autoThreshold)}`
+                      `Test order (${formatUSD(65.0)}) vs threshold ${formatUSD(autoThreshold)} (approval required)`
                     )
                   }
                   disabled={busyId === 'PURCHASE-65'}
@@ -1615,9 +1609,9 @@ export default function App() {
                   onClick={() =>
                     handleQuickPurchaseScenario(
                       'AWS Dedicated Node',
-                      'Instance H100 Mensuelle',
+                      'Dedicated H100 Instance',
                       450.0,
-                      `Ordre test (${formatUSD(450.0)}) face au plafond ${formatUSD(monthlyLimit)}`
+                      `Test order (${formatUSD(450.0)}) vs monthly budget limit ${formatUSD(monthlyLimit)} (blocked)`
                     )
                   }
                   disabled={busyId === 'PURCHASE-450'}
@@ -1642,7 +1636,7 @@ export default function App() {
                   onClick={() => setShowCustomOrderForm((prev) => !prev)}
                   className="w-full flex items-center justify-between text-xs font-medium text-[#4A5568] hover:text-[#003087] py-1"
                 >
-                  <span>Personnaliser un ordre d’achat…</span>
+                  <span>Customize purchase order…</span>
                   {showCustomOrderForm ? (
                     <ChevronUp className="w-3.5 h-3.5" />
                   ) : (
@@ -1657,14 +1651,14 @@ export default function App() {
                         type="text"
                         value={vendorName}
                         onChange={(e) => setVendorName(e.target.value)}
-                        placeholder="Fournisseur"
+                        placeholder="Vendor"
                         className="rounded-lg border border-[#CBD5E1] px-3 py-1.5 text-xs"
                       />
                       <input
                         type="text"
                         value={itemName}
                         onChange={(e) => setItemName(e.target.value)}
-                        placeholder="Service / Ressource"
+                        placeholder="Service / Resource"
                         className="rounded-lg border border-[#CBD5E1] px-3 py-1.5 text-xs"
                       />
                     </div>
@@ -1678,7 +1672,7 @@ export default function App() {
                         <option value="Developer Tools">Developer Tools</option>
                         <option value="Security & Infra">Security & Infra</option>
                         <option value="Non-Whitelisted Gaming">
-                          Catégorie non autorisée (Test blocage)
+                          Restricted Category (Policy Violation Test)
                         </option>
                       </select>
                       <input
@@ -1692,7 +1686,7 @@ export default function App() {
                         type="submit"
                         className="pressable px-3.5 py-1.5 rounded-lg bg-[#003087] hover:bg-[#001C64] text-white text-xs font-semibold shrink-0"
                       >
-                        Commander
+                        Create Order
                       </button>
                     </div>
                   </form>
@@ -1705,13 +1699,13 @@ export default function App() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h3 className="text-[15px] font-semibold text-[#0C121D]">
-                    Journal d’audit PayPal & SHA-256
+                    PayPal Audit Trail & SHA-256 Ledger
                   </h3>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#EAF7F0] text-[#0E7C47]">
-                    {auditChainVerified ? 'Chaîne SHA-256 vérifiée' : 'Audit actif'}
+                    {auditChainVerified ? 'SHA-256 Chain Verified' : 'Audit Active'}
                   </span>
                 </div>
-                <span className="text-xs text-[#718096]">{audit_trail.length} événements</span>
+                <span className="text-xs text-[#718096]">{audit_trail.length} events</span>
               </div>
 
               {executedProposals.length > 0 && (
@@ -1755,7 +1749,7 @@ export default function App() {
                                 rel="noreferrer"
                                 className="inline-flex items-center gap-1 text-[#0070BA] hover:underline font-medium"
                               >
-                                <span>Lien Checkout Sandbox</span>
+                                <span>Sandbox Checkout Link</span>
                                 <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
@@ -1797,14 +1791,14 @@ export default function App() {
           <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl spring-settle">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-semibold text-[#0C121D]">
-                Identifiants PayPal Sandbox & Google Gemini
+                PayPal Sandbox & Google Gemini Credentials
               </h3>
               <button
                 type="button"
                 onClick={() => setShowCredentialsModal(false)}
                 className="text-xs text-[#718096] hover:text-[#0C121D]"
               >
-                Fermer
+                Close
               </button>
             </div>
 
@@ -1872,14 +1866,14 @@ export default function App() {
                   onClick={() => setShowCredentialsModal(false)}
                   className="pressable px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-medium text-[#4A5568]"
                 >
-                  Annuler
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={busyId === 'CREDS'}
                   className="pressable px-4 py-2 rounded-xl bg-[#003087] hover:bg-[#001C64] text-white text-xs font-semibold"
                 >
-                  {busyId === 'CREDS' ? 'Vérification OAuth2…' : 'Enregistrer et connecter'}
+                  {busyId === 'CREDS' ? 'Verifying OAuth2…' : 'Save & Connect Live'}
                 </button>
               </div>
             </form>
@@ -1889,14 +1883,14 @@ export default function App() {
 
       {/* Corporate CFO Audit Boardpack Modal */}
       {showCFOModal && cfoBoardpack && (
-        <div className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div id="cfo-modal" className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-3xl w-full p-6 space-y-6 shadow-2xl my-8 spring-settle">
             <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#003087]" />
                   <h3 className="text-lg font-bold text-[#003087]">
-                    Rapport d'Audit Financier CFO
+                    Corporate CFO Audit Boardpack
                   </h3>
                   <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#E8F3FF] text-[#003087]">
                     {cfoBoardpack.report_id}
@@ -1914,7 +1908,7 @@ export default function App() {
                   className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#CBD5E1] hover:border-[#003087] text-xs font-semibold text-[#0C121D]"
                 >
                   <Printer className="w-3.5 h-3.5 text-[#003087]" />
-                  <span>Imprimer / PDF</span>
+                  <span>Print / Export PDF</span>
                 </button>
                 <button
                   type="button"
@@ -1929,42 +1923,42 @@ export default function App() {
             {/* KPI Benchmarks Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-                <div className="text-[11px] font-medium text-[#718096]">Dépense Initiale</div>
+                <div className="text-[11px] font-medium text-[#718096]">Baseline Spend</div>
                 <div className="text-sm font-bold text-[#4A5568] tabular-figure line-through">
                   {formatUSD(cfoBoardpack.kpi_summary.baseline_monthly_spend_usd)}/mo
                 </div>
                 <div className="text-[11px] text-[#A0AEC0]">
-                  {formatUSD(cfoBoardpack.kpi_summary.baseline_annual_spend_usd)}/an
+                  {formatUSD(cfoBoardpack.kpi_summary.baseline_annual_spend_usd)}/yr
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
-                <div className="text-[11px] font-medium text-[#718096]">Dépense Actuelle</div>
+                <div className="text-[11px] font-medium text-[#718096]">Current Spend</div>
                 <div className="text-base font-bold text-[#003087] tabular-figure">
                   {formatUSD(cfoBoardpack.kpi_summary.current_monthly_spend_usd)}/mo
                 </div>
                 <div className="text-[11px] text-[#718096]">
-                  {formatUSD(cfoBoardpack.kpi_summary.current_annual_spend_usd)}/an
+                  {formatUSD(cfoBoardpack.kpi_summary.current_annual_spend_usd)}/yr
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#EAF7F0] border border-[#0E7C47]/20 space-y-1">
-                <div className="text-[11px] font-medium text-[#0E7C47]">Économies Réalisées</div>
+                <div className="text-[11px] font-medium text-[#0E7C47]">Realized Savings</div>
                 <div className="text-base font-bold text-[#0E7C47] tabular-figure">
-                  {formatUSD(cfoBoardpack.kpi_summary.realized_annual_savings_usd)}/an
+                  {formatUSD(cfoBoardpack.kpi_summary.realized_annual_savings_usd)}/yr
                 </div>
                 <div className="text-[11px] text-[#0E7C47] font-semibold">
-                  -{cfoBoardpack.kpi_summary.percentage_spend_reduction}% de baisse
+                  -{cfoBoardpack.kpi_summary.percentage_spend_reduction}% reduction
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#E8F3FF] border border-[#0070BA]/20 space-y-1">
-                <div className="text-[11px] font-medium text-[#003087]">Score de Santé</div>
+                <div className="text-[11px] font-medium text-[#003087]">Health Score</div>
                 <div className="text-base font-bold text-[#003087] tabular-figure">
                   {cfoBoardpack.financial_health_score}/100
                 </div>
                 <div className="text-[11px] text-[#0070BA] font-semibold">
-                  Grade A+ Trésorerie
+                  Treasury Grade A+
                 </div>
               </div>
             </div>
@@ -1973,7 +1967,7 @@ export default function App() {
             <div className="bg-[#FAFBFD] border border-[#E2E8F0] rounded-xl p-4 space-y-2">
               <div className="text-xs font-semibold text-[#003087] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#003087]" />
-                Synthèse Exécutive pour le Conseil d'Administration
+                Executive Summary for the Board of Directors
               </div>
               <p className="text-xs text-[#4A5568] leading-relaxed">
                 {cfoBoardpack.executive_summary ||
@@ -1984,17 +1978,17 @@ export default function App() {
             {/* Certified Subscriptions Matrix */}
             <div className="space-y-2">
               <div className="text-xs font-semibold text-[#0C121D]">
-                Matrice des Abonnements PayPal ({cfoBoardpack.subscriptions_matrix.length} audités)
+                PayPal Subscriptions Matrix ({cfoBoardpack.subscriptions_matrix.length} audited)
               </div>
               <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
                 <table className="w-full text-xs text-left">
                   <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#718096] font-medium">
                     <tr>
-                      <th className="py-2.5 px-3">Fournisseur & Plan</th>
-                      <th className="py-2.5 px-3">Statut</th>
-                      <th className="py-2.5 px-3 text-right">Coût/Mois</th>
-                      <th className="py-2.5 px-3 text-right">Score Gaspillage</th>
-                      <th className="py-2.5 px-3 text-right">Économie Débloquée</th>
+                      <th className="py-2.5 px-3">Vendor & Plan</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Monthly Cost</th>
+                      <th className="py-2.5 px-3 text-right">Waste Score</th>
+                      <th className="py-2.5 px-3 text-right">Savings Unlocked</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E2E8F0]">
@@ -2036,7 +2030,7 @@ export default function App() {
                           </span>
                         </td>
                         <td className="py-2 px-3 text-right font-bold text-[#0E7C47] tabular-figure">
-                          +{formatUSD(row.annual_savings)}/an
+                          +{formatUSD(row.annual_savings)}/yr
                         </td>
                       </tr>
                     ))}
@@ -2050,10 +2044,10 @@ export default function App() {
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 font-semibold text-[#0E7C47]">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  Preuve Cryptographique SHA-256 Vérifiée
+                  Cryptographic SHA-256 Chain Verified
                 </div>
                 <div className="font-mono text-[11px] text-[#718096] break-all">
-                  Bloc : {cfoBoardpack.cryptographic_proof.latest_sha256_hash}
+                  Block: {cfoBoardpack.cryptographic_proof.latest_sha256_hash}
                 </div>
               </div>
               <div className="text-right shrink-0">
@@ -2071,18 +2065,18 @@ export default function App() {
 
       {/* B2B Retention Negotiation Modal */}
       {negotiatingSub && (
-        <div className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div id="b2b-modal" className="fixed inset-0 z-50 bg-[#0C121D]/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl my-8 spring-settle">
             <div className="flex items-start justify-between border-b border-[#E2E8F0] pb-3">
               <div>
                 <div className="flex items-center gap-2">
                   <Handshake className="w-5 h-5 text-[#003087]" />
                   <h3 className="text-base font-bold text-[#0C121D]">
-                    Négociation B2B — {negotiatingSub.vendor_name}
+                    B2B Retention Negotiation — {negotiatingSub.vendor_name}
                   </h3>
                 </div>
                 <p className="text-xs text-[#718096]">
-                  Mandat PayPal #{negotiatingSub.paypal_subscription_id} • Plan actuel : {negotiatingSub.plan_name} ({formatUSD(negotiatingSub.monthly_cost)}/mois)
+                  PayPal Agreement #{negotiatingSub.paypal_subscription_id} • Current Plan: {negotiatingSub.plan_name} ({formatUSD(negotiatingSub.monthly_cost)}/mo)
                 </p>
               </div>
               <button
@@ -2098,7 +2092,7 @@ export default function App() {
               <div className="py-12 text-center space-y-3">
                 <div className="w-7 h-7 border-2 border-[#003087] border-t-transparent rounded-full animate-spin mx-auto" />
                 <p className="text-xs font-semibold text-[#003087]">
-                  SentinelPay AI audite la télémétrie et rédige la mise en demeure formelle…
+                  SentinelPay AI is auditing telemetry and generating formal legal notice…
                 </p>
               </div>
             ) : negotiationResult ? (
@@ -2107,7 +2101,7 @@ export default function App() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-[#0C121D] flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5 text-[#003087]" />
-                    Mise en demeure générée par l'IA (Basée sur télémétrie réelle)
+                    AI Notice to Vendor Accounts (Derived from Real Telemetry)
                   </label>
                   <pre className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] text-[11px] font-mono text-[#334155] whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
                     {negotiationResult.ultimatum_letter}
@@ -2119,10 +2113,10 @@ export default function App() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[#0E7C47] flex items-center gap-1.5">
                       <CheckCircle2 className="w-4 h-4" />
-                      Contre-offre de rétention acceptée (-40% accordé)
+                      Retention Counter-Offer Accepted (40% Discount Authorized)
                     </span>
                     <span className="text-xs font-bold text-[#0E7C47] tabular-figure">
-                      +{formatUSD(negotiationResult.counter_offer.annual_savings_usd)}/an d'économie
+                      +{formatUSD(negotiationResult.counter_offer.annual_savings_usd)}/an annual savings
                     </span>
                   </div>
                   <p className="text-xs text-[#2D3748] leading-relaxed italic">
@@ -2130,13 +2124,13 @@ export default function App() {
                   </p>
                   <div className="pt-2 flex items-center gap-4 text-xs">
                     <div>
-                      <span className="text-[#718096]">Ancien prix : </span>
+                      <span className="text-[#718096]">Previous price: </span>
                       <span className="font-semibold text-[#A0AEC0] line-through tabular-figure">
                         {formatUSD(negotiatingSub.monthly_cost)}/mois
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#718096]">Nouveau prix négocié : </span>
+                      <span className="text-[#718096]">Negotiated new price: </span>
                       <span className="font-bold text-[#003087] tabular-figure">
                         {formatUSD(negotiationResult.counter_offer.proposed_monthly_cost)}/mois
                       </span>
@@ -2151,13 +2145,13 @@ export default function App() {
                     onClick={() => setNegotiatingSub(null)}
                     className="pressable px-4 py-2.5 rounded-xl border border-[#CBD5E1] text-xs font-medium text-[#4A5568]"
                   >
-                    Fermer
+                    Close
                   </button>
 
                   {negotiationResult.discount_applied_on_paypal ? (
                     <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0E7C47] text-white text-xs font-semibold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Remise appliquée sur PayPal via /revise</span>
+                      <span>Discount Applied on PayPal via /revise</span>
                     </div>
                   ) : (
                     <button
@@ -2169,10 +2163,10 @@ export default function App() {
                       <Handshake className="w-4 h-4" />
                       <span>
                         {busyId === `APPLY-NEG-${negotiatingSub.id}`
-                          ? 'Mise à jour PayPal /revise en cours…'
-                          : `Appliquer -40% sur PayPal (${formatUSD(
+                          ? 'Updating PayPal Agreement via /revise…'
+                          : `Apply 40% Discount on PayPal via /revise (${formatUSD(
                               negotiationResult.counter_offer.proposed_monthly_cost
-                            )}/mois)`}
+                            )}/mo)`}
                       </span>
                     </button>
                   )}
