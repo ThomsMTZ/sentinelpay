@@ -25,7 +25,11 @@ KEYNOTE_PRESENTATION_SCRIPT = """
 (() => {
   if (document.getElementById('apple-motion-cursor')) return;
 
-  // 1. Inject Styles for Apple Cursor, Ripple Physics & Keynote Slide Transitions
+  // 1. Remove early boot curtain if present now that slide overlay is mounting
+  const curtain = document.getElementById('early-boot-curtain');
+  if (curtain) curtain.remove();
+
+  // 2. Inject Styles for Apple Cursor, Ripple Physics & Keynote Slide Transitions
   const style = document.createElement('style');
   style.id = 'apple-motion-styles';
   style.textContent = `
@@ -156,7 +160,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
   `;
   document.head.appendChild(style);
 
-  // 2. Vector SVG Pointer (Apple macOS Aerodynamic Design)
+  // 3. Vector SVG Pointer (Apple macOS Aerodynamic Design)
   const cursor = document.createElement('div');
   cursor.id = 'apple-motion-cursor';
   cursor.innerHTML = `
@@ -211,7 +215,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     cursor.classList.remove('clicking');
   });
 
-  // 3. Full-Screen Keynote Slide Element (starts active for instant keynote opening)
+  // 4. Full-Screen Keynote Slide Element (starts active with title immediately)
   const slideOverlay = document.createElement('div');
   slideOverlay.id = 'keynote-slide-overlay';
   slideOverlay.className = 'active';
@@ -226,6 +230,20 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     <div id="slide-conclusion-extra" style="display: none;"></div>
   `;
   document.body.appendChild(slideOverlay);
+
+  // 5. Visual Frame Synchronization Trigger: 24x24 Magenta square at (0, 0)
+  // Removed precisely at start_time so FFmpeg can trim pre-demo setup with 100% mathematical accuracy!
+  const syncMarker = document.createElement('div');
+  syncMarker.id = 'recording-sync-trigger';
+  syncMarker.style.position = 'fixed';
+  syncMarker.style.top = '0px';
+  syncMarker.style.left = '0px';
+  syncMarker.style.width = '24px';
+  syncMarker.style.height = '24px';
+  syncMarker.style.background = '#FF00FF';
+  syncMarker.style.zIndex = '2147483647';
+  syncMarker.style.pointerEvents = 'none';
+  document.body.appendChild(syncMarker);
 
   window.showSlide = (kicker, title, subtitle, duration = 3000, slideType = 'normal') => {
     // Hide cursor during slide presentation so it never wanders in the void!
@@ -330,7 +348,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     }, duration);
   };
 
-  // 4. Dynamic Camera Zoom & Spotlight System (+25% Enlarged Radiant Spotlight)
+  // 6. Dynamic Camera Zoom & Spotlight System (+25% Enlarged Radiant Spotlight)
   const stage = document.getElementById('root') || document.body;
   stage.style.transformOrigin = '0 0';
   stage.style.willChange = 'transform';
@@ -395,10 +413,6 @@ KEYNOTE_PRESENTATION_SCRIPT = """
 
 
 def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
-    """
-    Curved human-like mouse movement with natural ease-out deceleration.
-    Uses quadratic bezier curve with subtle perpendicular deflection.
-    """
     current = getattr(page, "_last_mouse_pos", (960, 540))
     x0, y0 = current
     x2, y2 = target_x, target_y
@@ -412,7 +426,6 @@ def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
         page._last_mouse_pos = (x2, y2)
         return
 
-    # Perpendicular control point deflection for natural trajectory
     perp_scale = min(40, dist * 0.18) * (1 if random.random() > 0.5 else -1)
     norm = max(dist, 1)
     x1 = (x0 + x2) / 2 - (dy / norm) * perp_scale
@@ -436,9 +449,6 @@ def human_move(page, target_x, target_y, steps=22, base_delay=0.016):
 
 
 def move_to_locator(page, locator, offset_x=0.5, offset_y=0.5, delay_after=1.0):
-    """
-    Moves smoothly to element real screen coordinates derived from bounding_box().
-    """
     try:
         box = locator.bounding_box(timeout=3500)
         if box:
@@ -453,9 +463,6 @@ def move_to_locator(page, locator, offset_x=0.5, offset_y=0.5, delay_after=1.0):
 
 
 def click_locator_with_ripple(page, locator, delay_after=1.2):
-    """
-    Moves smoothly to element bounding box, triggers press with spring ripple, then releases.
-    """
     box = locator.bounding_box()
     if box:
         target_x = box["x"] + box["width"] / 2
@@ -498,6 +505,19 @@ def record_session():
             record_video_size={"width": 1920, "height": 1080}
         )
 
+        # Early boot curtain: keeps #root invisible while React hydrates so dashboard never flashes!
+        context.add_init_script("""
+            (() => {
+                const s = document.createElement('style');
+                s.id = 'early-boot-curtain';
+                s.textContent = `
+                    #root { opacity: 0 !important; }
+                    body { background: #FFFFFF !important; }
+                `;
+                document.documentElement.appendChild(s);
+            })()
+        """)
+
         page = context.new_page()
 
         # Step 0: Reset demo state for fresh clean start
@@ -509,30 +529,34 @@ def record_session():
         print("Navigating to SentinelPay Web Interface (http://127.0.0.1:5173)...")
         page.goto("http://127.0.0.1:5173", wait_until="networkidle")
 
-        # Wait until dashboard is fully hydrated and KPI banner is visible
+        # Wait until dashboard is fully hydrated behind the curtain
         page.wait_for_selector("#kpi-banner", state="visible", timeout=15000)
 
-        # Inject presentation engine (Slide 1 starts active immediately, cursor hidden)
+        # Inject presentation engine (mounts Keynote Slide Overlay and sync trigger box)
         page.evaluate(KEYNOTE_PRESENTATION_SCRIPT)
-        time.sleep(0.5)
+        time.sleep(0.6)
 
+        # Drop the sync trigger marker and begin presentation at the EXACT SAME instant!
         start_time = time.time()
-        print("Recording started at t=0s with Keynote Slide Transitions & Apple Motion Engine...")
+        print("Recording started at t=0s with Title Slide active & Apple Motion Engine...")
 
         # -------------------------------------------------------------
         # SCENE 1: The Snappy Hook, Quick Global Look & Tech Architecture (0s to 37.4s)
         # -------------------------------------------------------------
         print("\n[SCENE 1] Snappy Hook, Interface Overview & Architecture Slide (0s - 37.4s)...")
         print("  -> Displaying Slide 1: Welcome & Official Submission Slide (0.0s - 8.8s)...")
-        # Slide 1: Title & Hackathon Submission Hook
         page.evaluate("""
-            window.showSlide(
-                'PAYPAL AI HACKATHON 2026 • OFFICIAL SUBMISSION',
-                'SentinelPay: Autonomous Treasury & Agentic Commerce',
-                'Autonomous copilot eliminating zombie SaaS waste & policy-guarding AI spending with PayPal Sandbox APIs',
-                8800,
-                'normal'
-            )
+            (() => {
+                const marker = document.getElementById('recording-sync-trigger');
+                if (marker) marker.remove();
+                window.showSlide(
+                    'PAYPAL AI HACKATHON 2026 • OFFICIAL SUBMISSION',
+                    'SentinelPay: Autonomous Treasury & Agentic Commerce',
+                    'Autonomous copilot eliminating zombie SaaS waste & policy-guarding AI spending with PayPal Sandbox APIs',
+                    8800,
+                    'normal'
+                );
+            })()
         """)
         time.sleep(8.8)  # Slide dissolves smoothly right as narrator finishes the greeting
 
@@ -593,7 +617,7 @@ def record_session():
                 'normal'
             )
         """)
-        time.sleep(3.4)  # Slide presentation and dissolve
+        time.sleep(3.4)
 
         # Zoom into the Webhook Firewall section with 25% enlarged radiant spotlight!
         print("  -> Dynamic zoom onto #webhook-firewall (scale: 1.25 with 700px spotlight)...")
@@ -668,7 +692,7 @@ def record_session():
                 'normal'
             )
         """)
-        time.sleep(3.4)  # Slide presentation and dissolve
+        time.sleep(3.4)
 
         # Scroll down slightly to align Subscriptions Ledger
         page.mouse.wheel(0, 220)
@@ -699,7 +723,6 @@ def record_session():
         page.evaluate("window.cameraReset(400)")
         time.sleep(0.5)
 
-        # Scroll down so DesignFlow Enterprise is comfortably in view
         page.mouse.wheel(0, 260)
         time.sleep(0.8)
 
@@ -749,7 +772,6 @@ def record_session():
         if close_btn.count() > 0 and close_btn.first.is_visible():
             click_locator_with_ripple(page, close_btn.first, delay_after=0.8)
 
-        # Triple-check: if modal is still open, close it via state / backdrop click!
         page.evaluate("""(
             () => {
                 const btn = document.getElementById('b2b-close-btn') || document.getElementById('b2b-close-x-btn');
@@ -769,7 +791,6 @@ def record_session():
         # Scroll up to trigger batch sweep button
         page.mouse.wheel(0, -350)
         time.sleep(1.5)
-        # Click "Optimize Subscriptions" batch sweep button
         sweep_btn = page.locator("button:has-text('Optimize')")
         if sweep_btn.count() > 0:
             print("  -> Executing Autonomous Sweep...")
@@ -798,7 +819,7 @@ def record_session():
                 'normal'
             )
         """)
-        time.sleep(3.4)  # Slide presentation and dissolve
+        time.sleep(3.4)
 
         # Zoom into Guardrails & Purchases Panel with enlarged spotlight
         print("  -> Dynamic zoom onto #guardrails-panel (scale: 1.25)...")
@@ -838,9 +859,8 @@ def record_session():
                 'normal'
             )
         """)
-        time.sleep(3.2)  # Slide presentation and dissolve
+        time.sleep(3.2)
 
-        # Scroll to top to access header button
         page.mouse.wheel(0, -300)
         time.sleep(1.0)
 
@@ -850,7 +870,6 @@ def record_session():
             print("  -> Opening Certified CFO Boardpack modal...")
             click_locator_with_ripple(page, cfo_btn.first, delay_after=2.2)
 
-            # Clear stage transform to 'none' so CFO modal is 100% dead center
             page.evaluate("""
                 (() => {
                     const stage = document.getElementById('root') || document.body;
@@ -872,7 +891,6 @@ def record_session():
             if cfo_close.count() > 0:
                 click_locator_with_ripple(page, cfo_close, delay_after=1.0)
             
-            # Double check CFO modal is closed
             page.evaluate("""
                 (() => {
                     const modal = document.getElementById('cfo-modal');
@@ -904,10 +922,38 @@ def record_session():
 
         print(f"\nChoreographed recording completed in {time.time() - start_time:.2f}s!")
 
-        # Finalize video recording
         page.close()
         context.close()
         browser.close()
+
+
+def find_demo_start_offset(raw_video: str) -> float:
+    """
+    Scans the top-left 24x24 pixels of raw_video.
+    Before demo start, pixel (12, 12) is pure magenta (#FF00FF).
+    The very first frame where it is no longer magenta is the EXACT frame 0 of the presentation.
+    """
+    print(f"\nScanning {raw_video} for precise frame 0 demo start offset...")
+    seen_magenta = False
+    for t_ms in range(1000, 8000, 40):
+        t_sec = t_ms / 1000.0
+        cmd = [
+            FFMPEG_EXE, "-ss", f"{t_sec:.3f}", "-i", raw_video,
+            "-vframes", "1", "-vf", "crop=24:24:0:0",
+            "-f", "image2pipe", "-vcodec", "rawvideo", "-pix_fmt", "rgb24", "-"
+        ]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        if len(res.stdout) == 24 * 24 * 3:
+            idx = (12 * 24 + 12) * 3
+            r, g, b = res.stdout[idx], res.stdout[idx + 1], res.stdout[idx + 2]
+            is_magenta = (r > 200 and g < 50 and b > 200)
+            if is_magenta:
+                seen_magenta = True
+            elif seen_magenta and not is_magenta:
+                print(f"-> Frame 0 Slide Trigger detected at {t_sec:.3f}s (RGB: {r},{g},{b})!")
+                return t_sec
+    print("Warning: Sync marker transition not found, default to 5.04s")
+    return 5.04
 
 
 def merge_video_and_audio():
@@ -923,10 +969,12 @@ def merge_video_and_audio():
     # Forward slash path for FFmpeg subtitles filter
     ass_formatted = ass_file.replace("\\", "/")
 
-    print(f"\nMerging {raw_video} with {master_audio} and burning high-contrast ASS subtitles into {output_mp4}...")
+    start_offset = find_demo_start_offset(raw_video)
+    print(f"\nTrimming {start_offset:.3f}s of pre-demo setup so frame 0 starts IMMEDIATELY on the Title Slide at t=0s!")
 
     cmd = [
         FFMPEG_EXE, "-y",
+        "-ss", f"{start_offset:.3f}",
         "-i", raw_video,
         "-i", master_audio,
         "-vf", f"subtitles={ass_formatted}",
@@ -942,7 +990,7 @@ def merge_video_and_audio():
 
     subprocess.run(cmd, check=True)
     size_mb = os.path.getsize(output_mp4) / (1024 * 1024)
-    print(f"\nSUCCESS! Master Big Tech demo video produced with slide transitions & high-contrast subtitles: {output_mp4} ({size_mb:.2f} MB)")
+    print(f"\nSUCCESS! Master Big Tech demo video produced with 0ms Title Slide start: {output_mp4} ({size_mb:.2f} MB)")
 
 
 if __name__ == "__main__":
