@@ -198,6 +198,7 @@ function PayPalJsonInspectorButton({
 
       {open && (
         <div
+          id="paypal-json-drawer"
           onClick={(e) => e.stopPropagation()}
           className="mt-2 rounded-xl bg-[#0C121D] text-[#E2E8F0] p-3 text-[11px] font-mono space-y-2 border border-[#1E293B]"
         >
@@ -238,7 +239,7 @@ export default function App() {
   // Custom order form & collapsible toggle
   const [showCustomOrderForm, setShowCustomOrderForm] = useState<boolean>(false);
   const [vendorName, setVendorName] = useState<string>('RunPod Serverless GPU');
-  const [itemName, setItemName] = useState<string>('Crédits de calcul A100');
+  const [itemName, setItemName] = useState<string>('A100 GPU Compute Credits');
   const [orderAmount, setOrderAmount] = useState<string>('19.50');
   const [orderCategory, setOrderCategory] = useState<string>('Cloud & AI Compute');
 
@@ -291,7 +292,7 @@ export default function App() {
       setMonthlyLimit(res.budget_policy.monthly_autonomous_limit);
       setAutoThreshold(res.budget_policy.auto_approve_threshold);
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur réseau');
+      triggerToast(err instanceof Error ? err.message : 'Network error');
     } finally {
       setLoading(false);
     }
@@ -307,9 +308,9 @@ export default function App() {
       const res = await remediateSubscription(sub.id);
       setData(res.dashboard);
       triggerToast(
-        `${sub.vendor_name} mis à jour via PayPal (${formatUSD(
+        `${sub.vendor_name} updated on PayPal (${formatUSD(
           res.executed_proposal.annual_savings_usd
-        )}/an économisés)`
+        )}/yr saved)`
       );
     } catch (err) {
       triggerToast(err instanceof Error ? err.message : 'Erreur PayPal');
@@ -325,9 +326,9 @@ export default function App() {
       const res = await autoSwitchSubscription(sub.id);
       setData(res.dashboard);
       triggerToast(
-        `Arbitrage PayPal exécuté : remplacement par ${
+        `PayPal arbitrage executed: switched to ${
           sub.switch_alternative.alternative_vendor
-        } (${formatUSD(res.switch_result.annual_net_savings_usd)}/an économisés)`
+        } (${formatUSD(res.switch_result.annual_net_savings_usd)}/yr saved)`
       );
     } catch (err) {
       triggerToast(err instanceof Error ? err.message : 'Erreur lors du remplacement PayPal');
@@ -345,7 +346,7 @@ export default function App() {
       setData(res.dashboard);
       setWebhookInterception(res.interception);
       triggerToast(
-        `Webhook PayPal intercepté : remboursement instantané de ${formatUSD(
+        `PayPal webhook intercepted: instant refund of ${formatUSD(
           res.interception.intercepted_amount_usd
         )} (${res.interception.descriptor})`
       );
@@ -364,12 +365,12 @@ export default function App() {
       const res = await runAutonomousSweep();
       setData(res.dashboard);
       triggerToast(
-        `${res.sweep.executed_count} abonnements optimisés sur PayPal (${formatUSD(
+        `${res.sweep.executed_count} subscriptions optimized on PayPal (${formatUSD(
           res.sweep.annual_savings_unlocked_usd
-        )}/an récupérés)`
+        )}/yr recovered)`
       );
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur lors de l’optimisation');
+      triggerToast(err instanceof Error ? err.message : 'Error during optimization');
     } finally {
       setBusyId(null);
     }
@@ -385,7 +386,7 @@ export default function App() {
       triggerToast(
         err instanceof Error
           ? err.message
-          : 'Erreur lors de la génération du rapport CFO'
+          : 'Error generating certified CFO report'
       );
     } finally {
       setCFOLoading(false);
@@ -401,7 +402,7 @@ export default function App() {
       setNegotiationResult(res.negotiation);
     } catch (err) {
       triggerToast(
-        err instanceof Error ? err.message : 'Erreur lors de la négociation B2B'
+        err instanceof Error ? err.message : 'Error during B2B negotiation'
       );
       setNegotiatingSub(null);
     } finally {
@@ -417,15 +418,15 @@ export default function App() {
       setData(res.dashboard);
       setNegotiationResult(res.negotiation);
       triggerToast(
-        `Remise B2B de 40% appliquée via PayPal /revise (${formatUSD(
+        `B2B 40% discount applied via PayPal /revise (${formatUSD(
           res.negotiation.counter_offer.annual_savings_usd
-        )}/an économisés)`
+        )}/yr saved)`
       );
     } catch (err) {
       triggerToast(
         err instanceof Error
           ? err.message
-          : 'Erreur lors de l’application de la remise PayPal'
+          : 'Error applying PayPal discount'
       );
     } finally {
       setBusyId(null);
@@ -438,10 +439,10 @@ export default function App() {
       const res = await executeProposal(prop.proposal_id);
       setData(res.dashboard);
       triggerToast(
-        `Transaction ${prop.vendor_name} exécutée sur PayPal (${res.executed_proposal.paypal_receipt?.paypal_resource_id})`
+        `Transaction for ${prop.vendor_name} executed on PayPal (${res.executed_proposal.paypal_receipt?.paypal_resource_id})`
       );
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Approbation refusée');
+      triggerToast(err instanceof Error ? err.message : 'Approval rejected');
     } finally {
       setBusyId(null);
     }
@@ -468,21 +469,21 @@ export default function App() {
       const status = res.proposal.guardrail.approval_status;
       if (status === 'EXECUTED') {
         triggerToast(
-          `Ordre PayPal exécuté automatiquement (${formatUSD(amount)}) — Réf. ${
+          `PayPal order executed automatically (${formatUSD(amount)}) — Ref. ${
             res.proposal.paypal_receipt?.paypal_resource_id
           }`
         );
       } else if (status === 'PENDING_1CLICK_APPROVAL') {
         triggerToast(
-          `Montant supérieur au seuil automatique (${formatUSD(
+          `Amount exceeds automatic limit (${formatUSD(
             autoThreshold
-          )}) : placé en attente d’approbation 1 clic`
+          )}): queued for 1-click human approval`
         );
       } else {
-        triggerToast(`Ordre refusé par le plafond budgétaire : ${res.proposal.guardrail.reason}`);
+        triggerToast(`Order rejected by monthly budget cap: ${res.proposal.guardrail.reason}`);
       }
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur de paiement');
+      triggerToast(err instanceof Error ? err.message : 'Payment error');
     } finally {
       setBusyId(null);
     }
@@ -496,7 +497,7 @@ export default function App() {
       vendorName,
       itemName,
       parsedAmount,
-      `Achat initié depuis le terminal de commande (${itemName})`,
+      `Purchase initiated from command terminal (${itemName})`,
       orderCategory
     );
   };
@@ -511,7 +512,7 @@ export default function App() {
       setCommandReply(res.agent_response.reply);
       setCommandInput('');
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur lors de l’analyse');
+      triggerToast(err instanceof Error ? err.message : 'Error analyzing command');
     } finally {
       setCommandBusy(false);
     }
@@ -528,7 +529,7 @@ export default function App() {
         auto_approve_threshold: newThreshold,
       });
       setData(res.dashboard);
-      triggerToast('Règles budgétaires mises à jour');
+      triggerToast('Budget guardrails updated');
     } catch (err) {
       triggerToast(err instanceof Error ? err.message : 'Erreur de sauvegarde');
     }
@@ -556,9 +557,9 @@ export default function App() {
       setAutoThreshold(fresh.budget_policy.auto_approve_threshold);
       setWebhookInterception(null);
       setCommandReply(null);
-      triggerToast('Données de démonstration réinitialisées');
+      triggerToast('Demo data successfully reset');
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur de réinitialisation');
+      triggerToast(err instanceof Error ? err.message : 'Reset error');
     } finally {
       setBusyId(null);
     }
@@ -580,8 +581,8 @@ export default function App() {
       setShowCredentialsModal(false);
       triggerToast(
         res.connection_status.oauth_authenticated
-          ? 'Connecté en direct à PayPal Developer Sandbox (OAuth 2.0 vérifié)'
-          : 'Configuration enregistrée'
+          ? 'Connected live to PayPal Developer Sandbox (OAuth 2.0 verified)'
+          : 'Configuration saved'
       );
     } catch (err) {
       triggerToast(err instanceof Error ? err.message : 'Erreur d’enregistrement');
@@ -638,7 +639,7 @@ export default function App() {
         amountClass: 'text-[#C53030]',
         borderHoverClass: 'hover:border-[#C53030]',
         statusLabel: 'Blocked by Cap',
-        ruleLabel: `Hors plafond (${formatUSD(monthlyLimit)})`,
+        ruleLabel: `Exceeds cap (${formatUSD(monthlyLimit)})`,
       };
     }
     if (amount <= autoThreshold) {
@@ -646,14 +647,14 @@ export default function App() {
         amountClass: 'text-[#0E7C47]',
         borderHoverClass: 'hover:border-[#0E7C47]',
         statusLabel: 'Auto-Approved',
-        ruleLabel: `≤ seuil ${formatUSD(autoThreshold)}`,
+        ruleLabel: `≤ policy limit ${formatUSD(autoThreshold)}`,
       };
     }
     return {
       amountClass: 'text-[#B45309]',
       borderHoverClass: 'hover:border-[#0070BA]',
       statusLabel: 'Requires 1-Click',
-      ruleLabel: `> seuil ${formatUSD(autoThreshold)}`,
+      ruleLabel: `> policy limit ${formatUSD(autoThreshold)}`,
     };
   };
 
@@ -668,65 +669,65 @@ export default function App() {
       )}/mo)`;
     }
     if (sub.recommended_action === 'SUSPEND_SUBSCRIPTION') {
-      return 'Suspendre le prélèvement';
+      return 'Suspend billing agreement';
     }
-    return 'Résilier l’abonnement';
+    return 'Cancel subscription';
   };
 
   const getStatusBadge = (sub: SubscriptionItem) => {
     if (sub.status === 'CANCELLED') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F1F5F9] text-[#475569]">
-          Résilié sur PayPal
+          Cancelled on PayPal
         </span>
       );
     }
     if (sub.status === 'SUSPENDED') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FEF5E7] text-[#B45309]">
-          Suspendu sur PayPal
+          Suspended on PayPal
         </span>
       );
     }
     if (sub.status === 'DOWNGRADED') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#EAF7F0] text-[#0E7C47]">
-          Forfait optimisé
+          Plan optimized
         </span>
       );
     }
     if (sub.risk_category === 'DORMANT_ZOMBIE') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FFF0F0] text-[#C53030]">
-          Inactif depuis {sub.telemetry.days_since_last_login} j
+          Inactive for {sub.telemetry.days_since_last_login}d
         </span>
       );
     }
     if (sub.risk_category === 'OVERPROVISIONED_SEATS') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FEF5E7] text-[#B45309]">
-          {sub.telemetry.active_seats}/{sub.telemetry.provisioned_seats} sièges utilisés
+          {sub.telemetry.active_seats}/{sub.telemetry.provisioned_seats} seats used
         </span>
       );
     }
     if (sub.risk_category === 'DUPLICATE_SAAS') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FFF0F0] text-[#C53030]">
-          Doublon détecté
+          Duplicate detected
         </span>
       );
     }
     if (sub.risk_category === 'TRIAL_TRAP_CONVERSION') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FFF0F0] text-[#C53030] border border-[#C53030]/25">
-          Fin d’essai 1 $ → {formatUSD(sub.monthly_cost)} dans {sub.telemetry.trial_days_remaining} j
+          Trial ends $1 → {formatUSD(sub.monthly_cost)} in {sub.telemetry.trial_days_remaining}d
         </span>
       );
     }
     if (sub.risk_category === 'HIDDEN_MICRO_TX') {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FEF5E7] text-[#B45309]">
-          Hausse +{sub.telemetry.price_change_pct_last_90d}% sans usage
+          Price hike +{sub.telemetry.price_change_pct_last_90d}% (no usage)
         </span>
       );
     }
@@ -793,7 +794,7 @@ export default function App() {
               onClick={handleOpenCFOBoardpack}
               disabled={cfoLoading}
               className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#003087] hover:bg-[#001C64] text-xs font-semibold text-white shadow-sm"
-              title="Générer le rapport d'audit CFO certifié"
+              title="Generate certified CFO audit report"
             >
               <FileText className="w-3.5 h-3.5 text-white" />
               <span>{cfoLoading ? 'Generating…' : 'CFO Boardpack'}</span>
@@ -813,7 +814,7 @@ export default function App() {
               onClick={handleResetDemo}
               disabled={busyId === 'RESET'}
               className="pressable inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] text-xs font-medium text-[#4A5568]"
-              title="Reset Demo la démonstration"
+              title="Reset demo data to initial state"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Reset Demo</span>
@@ -1804,14 +1805,14 @@ export default function App() {
             </div>
 
             <p className="text-xs text-[#4A5568] leading-relaxed">
-              Collez vos clés PayPal Developer Sandbox et Gemini pour passer instantanément du
-              simulateur local aux appels API PayPal Sandbox en direct (persistés dans{' '}
+              Paste your PayPal Developer Sandbox and Gemini API keys to transition instantly from
+              local simulation to live sandbox API calls (persisted in{' '}
               <code className="font-mono">.env</code>).
             </p>
 
             {system_status.paypal_client_id_masked && (
               <div className="px-3 py-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#4A5568]">
-                Client ID configuré :{' '}
+                Configured Client ID:{' '}
                 <code className="font-mono text-[#0C121D]">
                   {system_status.paypal_client_id_masked}
                 </code>
@@ -1849,7 +1850,7 @@ export default function App() {
 
               <div>
                 <label className="block text-xs font-medium text-[#0C121D] mb-1">
-                  Clé API Google Gemini (gemini-2.5-flash)
+                  Google Gemini API Key (gemini-2.5-flash)
                 </label>
                 <input
                   type="password"
@@ -1973,7 +1974,7 @@ export default function App() {
               </div>
               <p className="text-xs text-[#4A5568] leading-relaxed">
                 {cfoBoardpack.executive_summary ||
-                  "Audit complet des mandats de facturation récurrente PayPal exécuté. Les anomalies de surprovisionnement, les hausses tarifaires furtives et les conversions d'essai gratuit ont été purgées avec succès."}
+                  "Comprehensive audit of recurring PayPal billing agreements executed. Overprovisioned seats, les hausses tarifaires furtives et les conversions d'essai gratuit ont été purgées avec succès."}
               </p>
             </div>
 

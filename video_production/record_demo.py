@@ -85,7 +85,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
       justify-content: center !important;
       align-items: center !important;
       text-align: center !important;
-      padding: 60px 80px !important;
+      padding: 50px 80px !important;
       opacity: 0;
       pointer-events: none;
       transform: scale(0.98);
@@ -120,7 +120,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
       font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
     }
     .slide-dot {
       width: 8px;
@@ -130,27 +130,27 @@ KEYNOTE_PRESENTATION_SCRIPT = """
       box-shadow: 0 0 10px rgba(0, 112, 186, 0.6);
     }
     .slide-title {
-      font-size: 58px;
+      font-size: 54px;
       font-weight: 800;
       letter-spacing: -0.035em;
       color: #0C121D;
-      margin: 0 0 18px 0;
-      max-width: 1180px;
-      line-height: 1.12;
+      margin: 0 0 16px 0;
+      max-width: 1200px;
+      line-height: 1.14;
     }
     .slide-divider {
       width: 84px;
       height: 4px;
       border-radius: 2px;
       background: linear-gradient(90deg, #003087, #0070BA, #009CDE);
-      margin: 8px 0 24px 0;
+      margin: 8px 0 22px 0;
     }
     .slide-subtitle {
-      font-size: 23px;
+      font-size: 22px;
       font-weight: 500;
       color: #4A5568;
       margin: 0;
-      max-width: 900px;
+      max-width: 950px;
       line-height: 1.5;
     }
   `;
@@ -218,16 +218,16 @@ KEYNOTE_PRESENTATION_SCRIPT = """
   slideOverlay.innerHTML = `
     <div class="slide-badge">
       <span class="slide-dot"></span>
-      <span id="slide-kicker-text">KEYNOTE OVERVIEW • ARCHITECTURE</span>
+      <span id="slide-kicker-text">PAYPAL AI HACKATHON 2026 • OFFICIAL SUBMISSION</span>
     </div>
-    <h1 class="slide-title" id="slide-title-text">Autonomous PayPal Treasury & Agentic Commerce</h1>
+    <h1 class="slide-title" id="slide-title-text">SentinelPay: Autonomous Treasury & Agentic Commerce</h1>
     <div class="slide-divider"></div>
-    <p class="slide-subtitle" id="slide-sub-text">Eliminating zombie SaaS waste & policy-guarding autonomous AI spending with PayPal Sandbox APIs</p>
+    <p class="slide-subtitle" id="slide-sub-text">Autonomous copilot eliminating zombie SaaS waste & policy-guarding AI spending with PayPal Sandbox APIs</p>
     <div id="slide-conclusion-extra" style="display: none;"></div>
   `;
   document.body.appendChild(slideOverlay);
 
-  window.showSlide = (kicker, title, subtitle, duration = 3000, isFinal = false) => {
+  window.showSlide = (kicker, title, subtitle, duration = 3000, slideType = 'normal') => {
     // Hide cursor during slide presentation so it never wanders in the void!
     const c = document.getElementById('apple-motion-cursor');
     if (c) c.classList.remove('visible');
@@ -237,7 +237,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     document.getElementById('slide-sub-text').textContent = subtitle;
 
     const extra = document.getElementById('slide-conclusion-extra');
-    if (isFinal) {
+    if (slideType === 'final') {
       extra.style.display = 'flex';
       extra.innerHTML = `
         <div style="margin-top: 36px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
@@ -264,6 +264,43 @@ KEYNOTE_PRESENTATION_SCRIPT = """
           </div>
         </div>
       `;
+    } else if (slideType === 'architecture') {
+      extra.style.display = 'flex';
+      extra.innerHTML = `
+        <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 1040px; text-align: left;">
+          <div style="padding: 18px 22px; border-radius: 16px; background: #F8FAFC; border: 1.5px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(0, 48, 135, 0.1); color: #003087; font-weight: 800; font-size: 13px;">PP</span>
+              <span style="font-size: 16px; font-weight: 700; color: #0C121D;">PayPal Subscriptions v1</span>
+            </div>
+            <p style="font-size: 13px; color: #64748B; margin: 0; line-height: 1.45;">Automated recurring billing audit, webhook lifecycle events, and in-flight agreement revision via <code style="color: #003087; font-weight: 600;">/revise</code>.</p>
+          </div>
+
+          <div style="padding: 18px 22px; border-radius: 16px; background: #F8FAFC; border: 1.5px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(0, 112, 186, 0.1); color: #0070BA; font-weight: 800; font-size: 13px;">v2</span>
+              <span style="font-size: 16px; font-weight: 700; color: #0C121D;">Orders v2 & Captures Refund</span>
+            </div>
+            <p style="font-size: 13px; color: #64748B; margin: 0; line-height: 1.45;">Sub-100ms clawbacks via <code style="color: #0070BA; font-weight: 600;">/refund</code> and autonomous GPU/token credit procurement via Orders v2.</p>
+          </div>
+
+          <div style="padding: 18px 22px; border-radius: 16px; background: #F8FAFC; border: 1.5px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(14, 124, 71, 0.1); color: #0E7C47; font-weight: 800; font-size: 13px;">AI</span>
+              <span style="font-size: 16px; font-weight: 700; color: #0C121D;">Google Gemini 2.5 Flash</span>
+            </div>
+            <p style="font-size: 13px; color: #64748B; margin: 0; line-height: 1.45;">Autonomous seat telemetry reasoning, market pricing arbitrage, and multi-turn vendor retention negotiation.</p>
+          </div>
+
+          <div style="padding: 18px 22px; border-radius: 16px; background: #F8FAFC; border: 1.5px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(217, 119, 6, 0.1); color: #D97706; font-weight: 800; font-size: 13px;">256</span>
+              <span style="font-size: 16px; font-weight: 700; color: #0C121D;">Policy Guardrails & SHA-256 Ledger</span>
+            </div>
+            <p style="font-size: 13px; color: #64748B; margin: 0; line-height: 1.45;">Deterministic spend bounds, human-in-the-loop approval queues, and immutable cryptographic audit trails.</p>
+          </div>
+        </div>
+      `;
     } else {
       extra.style.display = 'none';
       extra.innerHTML = '';
@@ -275,7 +312,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     if (window._slideExitTimeout) clearTimeout(window._slideExitTimeout);
     if (window._slideDoneTimeout) clearTimeout(window._slideDoneTimeout);
 
-    if (isFinal) {
+    if (slideType === 'final') {
       // Keep final thank-you slide active until the end
       return;
     }
@@ -293,7 +330,7 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     }, duration);
   };
 
-  // 4. Dynamic Camera Zoom & Spotlight System
+  // 4. Dynamic Camera Zoom & Spotlight System (+25% Enlarged Radiant Spotlight)
   const stage = document.getElementById('root') || document.body;
   stage.style.transformOrigin = '0 0';
   stage.style.willChange = 'transform';
@@ -337,8 +374,8 @@ KEYNOTE_PRESENTATION_SCRIPT = """
     stage.style.transform = `translate3d(${translateX.toFixed(2)}px, ${translateY.toFixed(2)}px, 0) scale(${scale})`;
 
     if (spotlight) {
-      // Radiant spotlight halo: center is brilliant white luminescence (not dark!), outer edges soft cinematic vignette
-      scrim.style.background = 'radial-gradient(circle 560px at 50% 50%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0) 55%, rgba(12, 18, 29, 0.22) 78%, rgba(12, 18, 29, 0.48) 100%)';
+      // 25% Enlarged radiant spotlight halo (700px radius): center is brilliant white luminescence, outer edges soft cinematic vignette
+      scrim.style.background = 'radial-gradient(circle 700px at 50% 50%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.20) 35%, rgba(255, 255, 255, 0) 62%, rgba(12, 18, 29, 0.18) 82%, rgba(12, 18, 29, 0.45) 100%)';
       scrim.style.opacity = '1';
     } else {
       scrim.style.opacity = '0';
@@ -456,6 +493,7 @@ def record_session():
         context = browser.new_context(
             viewport={"width": 1920, "height": 1080},
             device_scale_factor=1.0,
+            locale="en-US",
             record_video_dir="video_production/raw_video",
             record_video_size={"width": 1920, "height": 1080}
         )
@@ -482,90 +520,89 @@ def record_session():
         print("Recording started at t=0s with Keynote Slide Transitions & Apple Motion Engine...")
 
         # -------------------------------------------------------------
-        # SCENE 1: The Hook & Overview (0s to ~33.3s)
+        # SCENE 1: The Snappy Hook, Quick Global Look & Tech Architecture (0s to 37.4s)
         # -------------------------------------------------------------
-        print("\n[SCENE 1] Hook & Overview (0s - 33.3s)...")
-        print("  -> Displaying Slide 1: Introduction Title Slide (0.0s - 3.2s)...")
-        # Trigger slide 1 dissolve after 3.2s (cursor stays hidden until slide dissolves)
+        print("\n[SCENE 1] Snappy Hook, Interface Overview & Architecture Slide (0s - 37.4s)...")
+        print("  -> Displaying Slide 1: Welcome & Official Submission Slide (0.0s - 8.8s)...")
+        # Slide 1: Title & Hackathon Submission Hook
         page.evaluate("""
             window.showSlide(
-                'KEYNOTE OVERVIEW • ARCHITECTURE',
-                'Autonomous PayPal Treasury & Agentic Commerce',
-                'Eliminating zombie SaaS waste & policy-guarding autonomous AI spending with PayPal Sandbox APIs',
-                3200
+                'PAYPAL AI HACKATHON 2026 • OFFICIAL SUBMISSION',
+                'SentinelPay: Autonomous Treasury & Agentic Commerce',
+                'Autonomous copilot eliminating zombie SaaS waste & policy-guarding AI spending with PayPal Sandbox APIs',
+                8800,
+                'normal'
             )
         """)
-        time.sleep(3.2)  # Wait for slide presentation and smooth dissolve
+        time.sleep(8.8)  # Slide dissolves smoothly right as narrator finishes the greeting
 
-        # Slide dissolved -> cursor fades in cleanly onto SentinelPay brand
+        # Step 1b: Quick Global Visual of the Interface (8.8s - 18.5s)
+        print("  -> Quick Global Visual of the Interface (8.8s - 18.5s)...")
         brand_logo = page.locator("span:has-text('SentinelPay')").first
-        move_to_locator(page, brand_logo, offset_x=0.5, offset_y=0.5, delay_after=2.0)
+        move_to_locator(page, brand_logo, offset_x=0.5, offset_y=0.5, delay_after=1.2)
 
-        # Dynamic zoom on KPI financial synthesis banner
-        print("  -> Dynamic zoom onto #kpi-banner (scale: 1.15)...")
-        page.evaluate("window.cameraZoomTo('#kpi-banner', 1.15, 800, false)")
-        time.sleep(1.0)
-
-        # Hover potential annual savings heading directly via locator bounding box
-        savings_h1 = page.locator("#kpi-banner h1").first
-        move_to_locator(page, savings_h1, offset_x=0.4, offset_y=0.5, delay_after=3.0)
-
-        # Hover active monthly commitments card
-        commit_card = page.locator("#kpi-banner").get_by_text("Active Monthly Commitments").first
-        move_to_locator(page, commit_card, offset_x=0.5, offset_y=1.5, delay_after=3.0)
-
-        # Hover Health Score bar
-        health_label = page.locator("#kpi-banner").get_by_text("Health Score:").first
-        move_to_locator(page, health_label, offset_x=0.5, offset_y=0.5, delay_after=3.0)
-
-        # Reset camera before overview scroll
-        page.evaluate("window.cameraReset(650)")
+        # Dynamic gentle zoom on KPI financial synthesis banner
+        print("  -> Dynamic gentle zoom onto #kpi-banner (scale: 1.12)...")
+        page.evaluate("window.cameraZoomTo('#kpi-banner', 1.12, 700, false)")
         time.sleep(0.8)
 
-        # Smooth scroll down to showcase the subscriptions
-        page.mouse.wheel(0, 180)
-        time.sleep(1.5)
+        # Hover potential annual savings heading
+        savings_h1 = page.locator("#kpi-banner h1").first
+        move_to_locator(page, savings_h1, offset_x=0.4, offset_y=0.5, delay_after=1.8)
 
-        # Hover first subscription row (CloudGPU)
-        sub_row1 = page.locator("span:has-text('CloudGPU Studio Pro')").first
-        move_to_locator(page, sub_row1, offset_x=0.5, offset_y=0.5, delay_after=2.5)
+        # Reset camera before swift overview scroll
+        page.evaluate("window.cameraReset(500)")
+        time.sleep(0.5)
 
-        # Hover second subscription row (DesignFlow)
-        sub_row2 = page.locator("span:has-text('DesignFlow Enterprise')").first
-        move_to_locator(page, sub_row2, offset_x=0.5, offset_y=0.5, delay_after=2.5)
+        # Smooth scroll down to give a quick glance of the full interface
+        page.mouse.wheel(0, 220)
+        time.sleep(1.2)
+        # Scroll back up to align for the architecture slide
+        page.mouse.wheel(0, -220)
+        time.sleep(1.0)
 
-        # Scroll back up to top banner for scene 2
-        page.mouse.wheel(0, -200)
-        time.sleep(1.5)
+        # Step 1c: Technical Architecture Slide (18.5s - 36.6s)
+        print("  -> Displaying Slide 1b: Technical Architecture Slide (18.5s - 36.6s)...")
+        page.evaluate("""
+            window.showSlide(
+                'SYSTEM ARCHITECTURE • BUILT FOR AGENTIC COMMERCE',
+                'Powered by PayPal Sandbox APIs & Google Gemini',
+                'Native Subscriptions v1, Orders v2, and Captures v2 orchestrated by Gemini 2.5 Flash with deterministic budget guardrails',
+                17500,
+                'architecture'
+            )
+        """)
+        time.sleep(17.5)  # Technical slide dissolves into Scene 2
 
-        # Synchronize with Scene 1 audio boundary (33.3s)
+        # Synchronize with Scene 1 audio boundary (37.4s)
         elapsed = time.time() - start_time
-        if elapsed < 33.3:
-            time.sleep(33.3 - elapsed)
+        if elapsed < 37.4:
+            time.sleep(37.4 - elapsed)
 
         # -------------------------------------------------------------
-        # SCENE 2: Live Webhook Trap & Instant Refund (33.3s to ~71.0s)
+        # SCENE 2: Live Webhook Trap & Dynamic Camera Recalibration on JSON (37.4s to 74.9s)
         # -------------------------------------------------------------
-        print("\n[SCENE 2] Live Webhook Firewall & Instant Refund (33.3s - 71.0s)...")
-        print("  -> Displaying Slide 2: Webhook Firewall Title Slide (33.3s - 36.8s)...")
+        print("\n[SCENE 2] Live Webhook Firewall & Instant Refund (37.4s - 74.9s)...")
+        print("  -> Displaying Slide 2: Webhook Firewall Title Slide (37.4s - 40.8s)...")
         page.evaluate("""
             window.showSlide(
                 'PART 01 • REAL-TIME THREAT DEFENSE',
                 'Real-Time PayPal Webhook Firewall',
                 'Zero-trust interception of stealth price hikes & instant clawback refund via Captures API v2 in under 100ms',
-                3400
+                3400,
+                'normal'
             )
         """)
         time.sleep(3.4)  # Slide presentation and dissolve
 
-        # Zoom into the Webhook Firewall section
-        print("  -> Dynamic zoom onto #webhook-firewall (scale: 1.25)...")
+        # Zoom into the Webhook Firewall section with 25% enlarged radiant spotlight!
+        print("  -> Dynamic zoom onto #webhook-firewall (scale: 1.25 with 700px spotlight)...")
         page.evaluate("window.cameraZoomTo('#webhook-firewall', 1.25, 750, true)")
         time.sleep(1.5)
 
         # Hover firewall title
         firewall_title = page.locator("#webhook-firewall h2").first
-        move_to_locator(page, firewall_title, offset_x=0.3, offset_y=0.5, delay_after=2.0)
+        move_to_locator(page, firewall_title, offset_x=0.3, offset_y=0.5, delay_after=1.8)
 
         # Click button "Simulate Trial Trap $1 -> $49" with water-ripple pulse
         trap_button = page.locator("button:has-text('Simulate Trial Trap')")
@@ -575,40 +612,60 @@ def record_session():
 
         # Spotlight the instant refund receipt ($49.00 refunded)
         refund_badge = page.get_by_text("Instant PayPal Refund Executed").first
-        move_to_locator(page, refund_badge, offset_x=0.5, offset_y=0.5, delay_after=3.0)
+        move_to_locator(page, refund_badge, offset_x=0.5, offset_y=0.5, delay_after=2.5)
 
         # Click on Developer X-Ray JSON Inspector button to reveal PayPal raw response
         inspector_btn = page.locator("button:has-text('Inspect PayPal JSON')")
         if inspector_btn.count() > 0:
             print("  -> Clicking PayPal Developer X-Ray...")
-            click_locator_with_ripple(page, inspector_btn.first, delay_after=1.8)
-            time.sleep(3.0)
+            click_locator_with_ripple(page, inspector_btn.first, delay_after=1.0)
+            
+            # Wait for JSON drawer to mount
+            page.wait_for_selector("#paypal-json-drawer", state="visible", timeout=4000)
+
+            # DYNAMIC CAMERA RECALIBRATION: smoothly pan and zoom directly to #paypal-json-drawer!
+            print("  -> CAMERA RECALIBRATION: Centering zoom onto #paypal-json-drawer...")
+            page.evaluate("window.cameraZoomTo('#paypal-json-drawer', 1.18, 650, true)")
+            time.sleep(1.0)
+
+            # Hover inside the raw JSON receipt and verified SHA-256 chain badge
+            json_badge = page.locator("#paypal-json-drawer span:has-text('SHA-256')").first
+            move_to_locator(page, json_badge, offset_x=0.5, offset_y=0.5, delay_after=1.5)
+
+            json_pre = page.locator("#paypal-json-drawer pre").first
+            move_to_locator(page, json_pre, offset_x=0.4, offset_y=0.3, delay_after=2.0)
+
             # Explicitly close the inspector drawer so it doesn't linger!
             hide_btn = page.locator("button:has-text('Hide PayPal JSON')")
             if hide_btn.count() > 0:
                 print("  -> Closing PayPal Developer X-Ray drawer...")
-                click_locator_with_ripple(page, hide_btn.first, delay_after=1.0)
+                click_locator_with_ripple(page, hide_btn.first, delay_after=0.8)
+
+            # Recalibrate camera back onto the firewall card
+            page.evaluate("window.cameraZoomTo('#webhook-firewall', 1.15, 500, true)")
+            time.sleep(0.8)
 
         # Reset camera smoothly
         page.evaluate("window.cameraReset(600)")
         time.sleep(1.0)
 
-        # Synchronize with Scene 2 audio boundary (71.0s)
+        # Synchronize with Scene 2 audio boundary (74.9s)
         elapsed = time.time() - start_time
-        if elapsed < 71.0:
-            time.sleep(71.0 - elapsed)
+        if elapsed < 74.9:
+            time.sleep(74.9 - elapsed)
 
         # -------------------------------------------------------------
-        # SCENE 3: SaaS Arbitrage & Gemini B2B Negotiation (71.0s to ~124.6s)
+        # SCENE 3: SaaS Arbitrage & Gemini B2B Negotiation (74.9s to 128.3s)
         # -------------------------------------------------------------
-        print("\n[SCENE 3] 1-Click SaaS Arbitrage & B2B Negotiation (71.0s - 124.6s)...")
-        print("  -> Displaying Slide 3: SaaS Arbitrage & B2B Negotiation Slide (71.0s - 74.5s)...")
+        print("\n[SCENE 3] 1-Click SaaS Arbitrage & B2B Negotiation (74.9s - 128.3s)...")
+        print("  -> Displaying Slide 3: SaaS Arbitrage & B2B Negotiation Slide (74.9s - 78.3s)...")
         page.evaluate("""
             window.showSlide(
                 'PART 02 • TREASURY OPTIMIZATION',
                 '1-Click SaaS Arbitrage & Gemini B2B Negotiation',
                 'Autonomous subscription replacement via Orders v2 & -40% enterprise discount via /revise',
-                3400
+                3400,
+                'normal'
             )
         """)
         time.sleep(3.4)  # Slide presentation and dissolve
@@ -617,7 +674,7 @@ def record_session():
         page.mouse.wheel(0, 220)
         time.sleep(1.2)
 
-        # Zoom into subscriptions ledger
+        # Zoom into subscriptions ledger with +25% enlarged radiant spotlight
         print("  -> Dynamic zoom onto #subscriptions-ledger (scale: 1.15)...")
         page.evaluate("window.cameraZoomTo('#subscriptions-ledger', 1.15, 750, false)")
         time.sleep(1.5)
@@ -722,39 +779,40 @@ def record_session():
         health_final = page.locator("#kpi-banner").get_by_text("Health Score:").first
         move_to_locator(page, health_final, offset_x=0.5, offset_y=0.5, delay_after=3.0)
 
-        # Synchronize with Scene 3 audio boundary (124.6s)
+        # Synchronize with Scene 3 audio boundary (128.3s)
         elapsed = time.time() - start_time
-        if elapsed < 124.6:
-            time.sleep(124.6 - elapsed)
+        if elapsed < 128.3:
+            time.sleep(128.3 - elapsed)
 
         # -------------------------------------------------------------
-        # SCENE 4: Agentic Commerce & Certified CFO Boardpack (124.6s to ~173.0s)
+        # SCENE 4: Agentic Commerce & Certified CFO Boardpack (128.3s to 175.7s)
         # -------------------------------------------------------------
-        print("\n[SCENE 4] Agentic Commerce & CFO Boardpack (124.6s - 173.0s)...")
-        print("  -> Displaying Slide 4: Budget Guardrails Title Slide (124.6s - 128.0s)...")
+        print("\n[SCENE 4] Agentic Commerce & CFO Boardpack (128.3s - 175.7s)...")
+        print("  -> Displaying Slide 4: Budget Guardrails Title Slide (128.3s - 131.7s)...")
         page.evaluate("""
             window.showSlide(
                 'PART 03 • AGENTIC COMMERCE & MCP',
                 'Zero-Trust Budget Guardrails & Orders v2',
                 'Policy-guarded autonomous procurement and standard Model Context Protocol for external AI agents',
-                3400
+                3400,
+                'normal'
             )
         """)
         time.sleep(3.4)  # Slide presentation and dissolve
 
-        # Zoom into Guardrails & Purchases Panel
+        # Zoom into Guardrails & Purchases Panel with enlarged spotlight
         print("  -> Dynamic zoom onto #guardrails-panel (scale: 1.25)...")
         page.evaluate("window.cameraZoomTo('#guardrails-panel', 1.25, 750, true)")
         time.sleep(2.0)
 
         # Test Scenario 1: $19.50 (Auto-approved under $25 threshold)
-        order_19 = page.locator("button:has-text('19,50')").or_(page.locator("button:has-text('19.50')"))
+        order_19 = page.locator("button:has-text('$19.50')").or_(page.locator("button:has-text('19.50')")).or_(page.locator("button:has-text('19,50')"))
         if order_19.count() > 0:
             print("  -> Purchasing $19.50 GPU Credits (Zero-Click Auto-Approved)...")
             click_locator_with_ripple(page, order_19.first, delay_after=2.0)
 
         # Test Scenario 2: $65.00 (Exceeds $25 threshold -> Human Approval Queue)
-        order_65 = page.locator("button:has-text('65,00')").or_(page.locator("button:has-text('65.00')"))
+        order_65 = page.locator("button:has-text('$65.00')").or_(page.locator("button:has-text('65.00')")).or_(page.locator("button:has-text('65,00')"))
         if order_65.count() > 0:
             print("  -> Submitting $65.00 Purchase (Approval Required)...")
             click_locator_with_ripple(page, order_65.first, delay_after=2.0)
@@ -776,7 +834,8 @@ def record_session():
                 'PART 04 • CORPORATE GOVERNANCE',
                 'Certified CFO Boardpack with SHA-256 Proof',
                 'Cryptographically verified before-and-after spend benchmarks and board-ready financial certification',
-                3200
+                3200,
+                'normal'
             )
         """)
         time.sleep(3.2)  # Slide presentation and dissolve
@@ -834,14 +893,14 @@ def record_session():
                 'Thank You',
                 'Autonomous PayPal Treasury & Agentic Commerce Copilot • PayPal AI Hackathon 2026',
                 8000,
-                true
+                'final'
             )
         """)
 
-        # Synchronize with master audio duration (~172.5s)
+        # Synchronize with master audio duration (~175.7s)
         elapsed = time.time() - start_time
-        if elapsed < 172.5:
-            time.sleep(172.5 - elapsed)
+        if elapsed < 175.7:
+            time.sleep(175.7 - elapsed)
 
         print(f"\nChoreographed recording completed in {time.time() - start_time:.2f}s!")
 

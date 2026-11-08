@@ -13,12 +13,10 @@ SCENES = [
     {
         "id": "scene1",
         "text": (
-            "Every year, companies and individuals waste over 135 billion dollars on zombie SaaS subscriptions, "
-            "underutilized team seats, and silent recurring price hikes. "
-            "Meanwhile, autonomous AI agents are ready to buy compute and software on our behalf—but no CFO will hand "
-            "an unconstrained LLM raw access to a PayPal account. "
-            "Welcome to SentinelPay: the autonomous PayPal Treasury and Agentic Commerce copilot, powered by Google Gemini "
-            "and native PayPal Sandbox REST APIs."
+            "Welcome to SentinelPay: the autonomous PayPal Treasury and Agentic Commerce copilot, built for the PayPal AI Hackathon 2026. "
+            "SentinelPay transforms how businesses manage recurring commitments, giving CFOs an intelligent command center over cash flow and autonomous transactions. "
+            "Under the hood, SentinelPay connects Google Gemini 2.5 Flash to PayPal's native Subscriptions v1, Orders v2, and Captures v2 APIs, "
+            "protected by deterministic policy guardrails and a cryptographic SHA-256 audit ledger."
         )
     },
     {
@@ -147,7 +145,6 @@ async def main():
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
     concat_list = []
-    
     for i, scene in enumerate(SCENES):
         print(f"Synthesizing {scene['id']} with exact sentence boundaries...")
         audio_path, duration, boundaries = await generate_scene_audio_with_cues(scene)
@@ -167,7 +164,7 @@ async def main():
         current_offset += duration
         if i < len(SCENES) - 1:
             concat_list.append("file 'silence08s.mp3'")
-            current_offset += 0.8  # Add pause offset
+            current_offset += 0.8  # Add pause offset between scenes
             
     # Write concat list
     concat_file = "video_production/audio/concat_list.txt"
@@ -206,7 +203,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         end_str = format_ass_time(cue["end"])
         text = cue["text"]
         # Format currency & symbols nicely for readability
-        text = text.replace("135 billion dollars", "$135 billion")
         text = text.replace("one-dollar", "$1")
         text = text.replace("49-dollar", "$49")
         text = text.replace("89 dollars a month", "$89/mo")
