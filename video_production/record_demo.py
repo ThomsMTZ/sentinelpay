@@ -628,13 +628,21 @@ def record_session():
         firewall_title = page.locator("#webhook-firewall h2").first
         move_to_locator(page, firewall_title, offset_x=0.3, offset_y=0.5, delay_after=1.8)
 
-        # Click button "Simulate Trial Trap $1 -> $49" with water-ripple pulse
-        trap_button = page.locator("button:has-text('Simulate Trial Trap')")
+        # Click button "Simulate MeetScribe Trial Trap ($1 -> $49)" with water-ripple pulse
+        trap_button = (
+            page.locator("button:has-text('MeetScribe')")
+            .or_(page.locator("button:has-text('Trial Trap')"))
+            .or_(page.locator("button:has-text('Simulate Trial Trap')"))
+        )
         if trap_button.count() > 0:
             print("  -> Clicking 'Simulate Trial Trap'...")
             click_locator_with_ripple(page, trap_button.first, delay_after=1.8)
 
         # Spotlight the instant refund receipt ($49.00 refunded)
+        try:
+            page.wait_for_selector("text=Instant PayPal Refund Executed", timeout=5000)
+        except Exception:
+            pass
         refund_badge = page.get_by_text("Instant PayPal Refund Executed").first
         move_to_locator(page, refund_badge, offset_x=0.5, offset_y=0.5, delay_after=2.5)
 
