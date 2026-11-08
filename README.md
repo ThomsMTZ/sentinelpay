@@ -53,7 +53,7 @@ Hackathon/
 │   │   └── api/
 │   │       └── routes.py              # REST API Endpoints
 │   └── tests/
-│       └── test_sentinel_backend.py   # Automated Pytest Suite (12/12 passing)
+│       └── test_sentinel_backend.py   # Automated Pytest Suite (13/13 passing)
 └── frontend/
     └── src/
         ├── App.tsx                    # PayPal Institutional UI with Apple Fluid Craft
