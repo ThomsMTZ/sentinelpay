@@ -25,5 +25,6 @@ backend/data/*.json
 # Video production raw files
 video_production/raw_video/
 video_production/audio/
+video_production/verify_frames/
 *.webm
 

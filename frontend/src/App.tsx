@@ -313,7 +313,7 @@ export default function App() {
         )}/yr saved)`
       );
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur PayPal');
+      triggerToast(err instanceof Error ? err.message : 'PayPal action failed');
     } finally {
       setBusyId(null);
     }
@@ -331,7 +331,7 @@ export default function App() {
         } (${formatUSD(res.switch_result.annual_net_savings_usd)}/yr saved)`
       );
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur lors du remplacement PayPal');
+      triggerToast(err instanceof Error ? err.message : 'PayPal automated migration failed');
     } finally {
       setBusyId(null);
     }
@@ -352,7 +352,7 @@ export default function App() {
       );
     } catch (err) {
       triggerToast(
-        err instanceof Error ? err.message : 'Erreur lors de la simulation du webhook'
+        err instanceof Error ? err.message : 'Webhook interception failed'
       );
     } finally {
       setBusyId(null);
@@ -531,7 +531,7 @@ export default function App() {
       setData(res.dashboard);
       triggerToast('Budget guardrails updated');
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur de sauvegarde');
+      triggerToast(err instanceof Error ? err.message : 'Failed to update budget policy');
     }
   };
 
@@ -542,7 +542,7 @@ export default function App() {
       setData(res.dashboard);
       triggerToast(res.seed_result.message);
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur Sandbox');
+      triggerToast(err instanceof Error ? err.message : 'PayPal Sandbox connection failed');
     } finally {
       setBusyId(null);
     }
@@ -585,7 +585,7 @@ export default function App() {
           : 'Configuration saved'
       );
     } catch (err) {
-      triggerToast(err instanceof Error ? err.message : 'Erreur d’enregistrement');
+      triggerToast(err instanceof Error ? err.message : 'Failed to save credentials');
     } finally {
       setBusyId(null);
     }
@@ -839,7 +839,7 @@ export default function App() {
               <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 text-xs font-medium text-[#D6ECFF]">
                 <span>PayPal Portfolio Financial Synthesis</span>
                 <span>•</span>
-                <span>{executive_ai_brief.provider}</span>
+                <span>{executive_ai_brief.provider?.includes('GEMINI') ? 'Audited by Google Gemini 2.5 Flash' : 'Audited by Sentinel Financial Intelligence'}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-semibold heading-tight tabular-figure">
                 {kpis.potential_annual_savings_usd > 0
@@ -935,13 +935,10 @@ export default function App() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-sm font-semibold text-[#0C121D]">
-                    Real-Time PayPal Webhook Firewall (
-                    <code className="font-mono text-xs text-[#003087]">PAYMENT.SALE.COMPLETED</code>{' '}
-                    &{' '}
-                    <code className="font-mono text-xs text-[#003087]">
-                      BILLING.SUBSCRIPTION.RENEWED
-                    </code>
-                    )
+                    Real-Time PayPal Webhook Firewall{' '}
+                    <span className="text-xs font-normal text-[#64748B]">
+                      (Monitoring MeetScribe AI, PulseMetrics &amp; Cloud Vendors)
+                    </span>
                   </h2>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#EAF7F0] text-[#0E7C47]">
                     <Zap className="w-3 h-3" /> Zero-Trust Monitoring Active
@@ -962,7 +959,7 @@ export default function App() {
               >
                 {busyId === 'WEBHOOK-TRIAL_CONVERSION'
                   ? 'Intercepting Webhook…'
-                  : 'Simulate Trial Trap $1 → $49'}
+                  : 'Simulate MeetScribe Trial Trap ($1 → $49)'}
               </button>
               <button
                 type="button"
@@ -972,7 +969,7 @@ export default function App() {
               >
                 {busyId === 'WEBHOOK-PRICE_HIKE'
                   ? 'Intercepting Webhook…'
-                  : 'Simulate Stealth Hike +169% ($39)'}
+                  : 'Simulate PulseMetrics Price Hike ($39/mo)'}
               </button>
             </div>
           </div>
@@ -996,7 +993,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-[#0C121D]">
                 <div className="bg-white/90 rounded-lg p-2.5 border border-[#0E7C47]/15">
                   <div className="text-[11px] text-[#718096]">
-                    1. Immediate PayPal Agreement Suspension (/suspend)
+                    1. Immediate PayPal Billing Agreement Suspension (Vendor Account Frozen)
                   </div>
                   <div className="font-mono text-[11px] text-[#0C121D] mt-0.5">
                     {webhookInterception.suspend_receipt.http_method}{' '}
@@ -1241,11 +1238,11 @@ export default function App() {
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {sub.telemetry.has_data_retention_or_contract_lock ? (
                                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[#FEF5E7] text-[#B45309] border border-[#B45309]/20">
-                                    Data Retention / Contract Lock Active (/suspend preferred)
+                                    Data Retention / Contract Lock Active (Safe Suspension Recommended)
                                   </span>
                                 ) : (
                                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[#EAF7F0] text-[#0E7C47] border border-[#0E7C47]/20">
-                                    No Data Lock (Safe Direct /cancel)
+                                    No Data Lock (Safe Direct Cancellation)
                                   </span>
                                 )}
                               </div>
@@ -1329,7 +1326,7 @@ export default function App() {
                                   <span>Autonomous B2B Retention Negotiation (Gemini AI)</span>
                                 </div>
                                 <p className="text-xs text-[#4A5568] leading-relaxed">
-                                  Generate formal legal notice based on verified telemetry and obtain a 40% enterprise discount via PayPal /revise.
+                                  Generate formal legal notice based on verified telemetry and obtain a 40% enterprise discount via PayPal Plan Revision.
                                 </p>
                               </div>
                               <button
@@ -1548,11 +1545,10 @@ export default function App() {
             <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 space-y-4 shadow-[0_1px_2px_rgba(12,18,29,0.03)]">
               <div>
                 <h3 className="text-[15px] font-semibold text-[#0C121D]">
-                  Autonomous Purchases (PayPal Orders v2)
+                  Autonomous Agent Procurement (AI Compute &amp; Token Packs)
                 </h3>
                 <p className="text-xs text-[#718096] mt-0.5">
-                  Test the 3 policy tiers against the live endpoint{' '}
-                  <code className="font-mono text-[11px]">/v2/checkout/orders</code>
+                  Policy-governed autonomous order execution via PayPal Orders v2
                 </p>
               </div>
 
@@ -1572,7 +1568,7 @@ export default function App() {
                   className={`pressable p-2.5 rounded-xl border border-[#E2E8F0] ${preset19.borderHoverClass} bg-[#F8FAFC] text-left`}
                 >
                   <div className={`text-xs font-semibold ${preset19.amountClass} tabular-figure`}>
-                    19,50 $
+                    $19.50
                   </div>
                   <div className="text-[11px] font-medium text-[#0C121D] mt-0.5">
                     {preset19.statusLabel}
@@ -1596,7 +1592,7 @@ export default function App() {
                   className={`pressable p-2.5 rounded-xl border border-[#E2E8F0] ${preset65.borderHoverClass} bg-[#F8FAFC] text-left`}
                 >
                   <div className={`text-xs font-semibold ${preset65.amountClass} tabular-figure`}>
-                    65,00 $
+                    $65.00
                   </div>
                   <div className="text-[11px] font-medium text-[#0C121D] mt-0.5">
                     {preset65.statusLabel}
@@ -1620,7 +1616,7 @@ export default function App() {
                   className={`pressable p-2.5 rounded-xl border border-[#E2E8F0] ${preset450.borderHoverClass} bg-[#F8FAFC] text-left`}
                 >
                   <div className={`text-xs font-semibold ${preset450.amountClass} tabular-figure`}>
-                    450,00 $
+                    $450.00
                   </div>
                   <div className="text-[11px] font-medium text-[#0C121D] mt-0.5">
                     {preset450.statusLabel}
@@ -1735,7 +1731,7 @@ export default function App() {
                         <span className="tabular-figure shrink-0">
                           {prop.amount_usd > 0
                             ? formatUSD(prop.amount_usd)
-                            : `-${formatUSD(prop.annual_savings_usd)}/an`}
+                            : `-${formatUSD(prop.annual_savings_usd)}/yr`}
                         </span>
                       </div>
                       {prop.paypal_receipt ? (
@@ -1974,7 +1970,7 @@ export default function App() {
               </div>
               <p className="text-xs text-[#4A5568] leading-relaxed">
                 {cfoBoardpack.executive_summary ||
-                  "Comprehensive audit of recurring PayPal billing agreements executed. Overprovisioned seats, les hausses tarifaires furtives et les conversions d'essai gratuit ont été purgées avec succès."}
+                  "Comprehensive audit of recurring PayPal billing agreements executed. Overprovisioned seats, stealth price increases, and free trial traps were systematically resolved."}
               </p>
             </div>
 
@@ -2156,7 +2152,7 @@ export default function App() {
                   {negotiationResult.discount_applied_on_paypal ? (
                     <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0E7C47] text-white text-xs font-semibold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Discount Applied on PayPal via /revise</span>
+                      <span>Discount Applied on PayPal via Plan Revision</span>
                     </div>
                   ) : (
                     <button
@@ -2168,8 +2164,8 @@ export default function App() {
                       <Handshake className="w-4 h-4" />
                       <span>
                         {busyId === `APPLY-NEG-${negotiatingSub.id}`
-                          ? 'Updating PayPal Agreement via /revise…'
-                          : `Apply 40% Discount on PayPal via /revise (${formatUSD(
+                          ? 'Updating PayPal Agreement…'
+                          : `Apply 40% Discount on PayPal (${formatUSD(
                               negotiationResult.counter_offer.proposed_monthly_cost
                             )}/mo)`}
                       </span>
